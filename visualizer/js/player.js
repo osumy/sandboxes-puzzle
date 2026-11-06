@@ -25,6 +25,9 @@ class TracePlayer {
 
   loadTrace(trace) {
     this.pause();
+    if (this.renderer && this.renderer.clearParticles) {
+      this.renderer.clearParticles();
+    }
     this.trace = trace;
     this.currentStepIndex = 0;
     this.stepProgress = 1.0;
@@ -58,6 +61,10 @@ class TracePlayer {
       cancelAnimationFrame(this.animFrameId);
       this.animFrameId = null;
     }
+    // Drain any in-flight particles cleanly into the sand surface
+    if (this.renderer && this.renderer.startParticleDrain) {
+      this.renderer.startParticleDrain(this.engine);
+    }
     this.onStateChange(false);
   }
 
@@ -75,6 +82,9 @@ class TracePlayer {
 
   stepForward() {
     this.pause();
+    if (this.renderer && this.renderer.clearParticles) {
+      this.renderer.clearParticles();
+    }
     if (!this.trace) return;
     if (this.currentStepIndex < this.trace.steps.length - 1) {
       this.seekTo(this.currentStepIndex + 1);
@@ -83,6 +93,9 @@ class TracePlayer {
 
   stepBackward() {
     this.pause();
+    if (this.renderer && this.renderer.clearParticles) {
+      this.renderer.clearParticles();
+    }
     if (!this.trace) return;
     if (this.currentStepIndex > 0) {
       this.seekTo(this.currentStepIndex - 1);
@@ -91,11 +104,17 @@ class TracePlayer {
 
   reset() {
     this.pause();
+    if (this.renderer && this.renderer.clearParticles) {
+      this.renderer.clearParticles();
+    }
     this.seekTo(0);
   }
 
   seekTo(index) {
     if (!this.trace || !this.trace.steps) return;
+    if (this.renderer && this.renderer.clearParticles) {
+      this.renderer.clearParticles();
+    }
     const target = Math.max(0, Math.min(this.trace.steps.length - 1, index));
     this.currentStepIndex = target;
     this.stepProgress = 1.0;
@@ -139,6 +158,9 @@ class TracePlayer {
       if (this.engine.isGoal() || this.currentStepIndex >= this.trace.steps.length - 1) {
         this.pause();
         this.renderer.render(this.engine, newStep, 1.0);
+        if (this.renderer && this.renderer.startParticleDrain) {
+          this.renderer.startParticleDrain(this.engine);
+        }
         this.onGoalReached(newStep);
         return;
       }

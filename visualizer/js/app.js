@@ -172,6 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const preset = window.SANDBOX_DATA.presets[currentPresetKey];
     if (!preset) return;
 
+    if (renderer.clearParticles) renderer.clearParticles();
     engine.reset(preset.initial_state);
     renderer.render(engine, null, 1.0);
     loadActiveTrace();
@@ -264,6 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (timelineSlider) {
     timelineSlider.addEventListener("input", (e) => {
       player.pause();
+      if (renderer.clearParticles) renderer.clearParticles();
       player.seekTo(Number(e.target.value));
     });
   }
@@ -339,6 +341,9 @@ document.addEventListener("DOMContentLoaded", () => {
           isManualAnimating = false;
           manualAnimId = null;
           renderer.render(engine, null, 1.0);
+          if (renderer.startParticleDrain) {
+            renderer.startParticleDrain(engine);
+          }
           updateManualHUD(actionRes);
         }
       }
