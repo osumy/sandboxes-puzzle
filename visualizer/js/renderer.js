@@ -129,38 +129,48 @@ class CanvasRenderer {
 
   /**
    * Compute smooth interpolated sand level during active gate animation.
+   * Supports both interactive manual mode and trace player playback.
    */
   getVisualSandLevel(engine, r, c, activeAction, progress) {
     if (!activeAction || progress >= 1.0 || activeAction.is_noop) {
       return engine.get(r, c);
     }
-    const type = activeAction.action_type || activeAction.actionType;
-    if (type === "TOP_DOWN") {
-      if (activeAction.row === r && activeAction.col === c) {
-        const s0 = activeAction.s_before !== undefined ? activeAction.s_before : engine.get(r, c);
-        const s1 = activeAction.s_after !== undefined ? activeAction.s_after : engine.get(r, c);
+    const s0 = engine.get(r, c);
+
+    // If activeAction provides the target state matrix (from solution trace)
+    if (activeAction.state && Array.isArray(activeAction.state) && activeAction.state[r]) {
+      const s1 = Number(activeAction.state[r][c]);
+      if (s0 !== s1) {
         return s0 + (s1 - s0) * progress;
       }
-      if (activeAction.row - 1 === r && activeAction.col === c) {
+      return s0;
+    }
+
+    const type = activeAction.action_type || activeAction.actionType;
+    const actionRow = activeAction.row !== undefined ? activeAction.row : (activeAction.target ? activeAction.target.row : null);
+    const actionCol = activeAction.col !== undefined ? activeAction.col : (activeAction.target ? activeAction.target.col : null);
+
+    if (type === "TOP_DOWN") {
+      if (actionRow === r && actionCol === c) {
+        const s_start = activeAction.s_before !== undefined ? activeAction.s_before : s0;
+        const s_end = activeAction.s_after !== undefined ? activeAction.s_after : Math.max(0, s0 - (activeAction.delta_s || 0));
+        return s_start + (s_end - s_start) * progress;
+      }
+      if (actionRow - 1 === r && actionCol === c) {
         const delta = activeAction.delta_s || 0;
-        const s1 = engine.get(r, c);
-        const s0 = Math.max(0, s1 - delta);
         return s0 + delta * progress;
       }
     } else if (type === "COLLECTOR_FLUSH") {
-      if (r === 0 && activeAction.col === c) {
-        const s0 = activeAction.s_before !== undefined ? activeAction.s_before : engine.get(0, c);
-        return s0 * (1.0 - progress);
+      if (r === 0 && actionCol === c) {
+        const s_start = activeAction.s_before !== undefined ? activeAction.s_before : s0;
+        return s_start * (1.0 - progress);
       }
     } else if (type === "SIDE_GATE") {
-      if (activeAction.row === r && !activeAction.is_noop) {
-        const s0_0 = activeAction.s0_before !== undefined ? activeAction.s0_before : 0.5;
-        const s0_1 = activeAction.s1_before !== undefined ? activeAction.s1_before : 0.5;
-        if (c === 0) return s0_0 + (0.5 - s0_0) * progress;
-        if (c === 1) return s0_1 + (0.5 - s0_1) * progress;
+      if (actionRow === r && !activeAction.is_noop) {
+        return s0 + (0.5 - s0) * progress;
       }
     }
-    return engine.get(r, c);
+    return s0;
   }
 
   /**
@@ -310,6 +320,10 @@ class CanvasRenderer {
     const ctx = this.ctx;
     const n = engine.numRows;
 
+    const actionType = activeAction ? (activeAction.action_type || activeAction.actionType) : null;
+    const actionRow = activeAction ? (activeAction.row !== undefined ? activeAction.row : (activeAction.target ? activeAction.target.row : null)) : null;
+    const actionCol = activeAction ? (activeAction.col !== undefined ? activeAction.col : (activeAction.target ? activeAction.target.col : null)) : null;
+
     // =========================================================================
     // 1. Horizontal Side Gates (Action b, between col 0 and 1 at row r)
     // =========================================================================
@@ -320,8 +334,7 @@ class CanvasRenderer {
       const gw = this.colGap - 8;
       const gh = this.cellHeight - 28;
 
-      const actionType = activeAction ? (activeAction.action_type || activeAction.actionType) : null;
-      const isActive = actionType === "SIDE_GATE" && activeAction.row === r;
+      const isActive = actionType === "SIDE_GATE" && actionRow === r;
       const isNoop = isActive && Boolean(activeAction.is_noop);
       const shake = isNoop ? Math.sin(progress * Math.PI * 6) * 3 : 0;
       const openAmount = (isActive && !isNoop) ? Math.sin(progress * Math.PI) : 0;
@@ -395,8 +408,7 @@ class CanvasRenderer {
         const gw = this.cellWidth - 16;
         const gh = this.rowGap - 6;
 
-        const actionType = activeAction ? (activeAction.action_type || activeAction.actionType) : null;
-        const isActive = actionType === "TOP_DOWN" && activeAction.row === r && activeAction.col === c;
+        const isActive = actionType === "TOP_DOWN" && actionRow === r && actionCol === c;
         const isNoop = isActive && Boolean(activeAction.is_noop);
         const isStuckOpen = engine.openGates && engine.openGates.has(`${r},${c}`);
         const isCascading = Boolean(activeAction && activeAction.cascade_occurred);
@@ -539,7 +551,13 @@ class CanvasRenderer {
         // Kinetic sand particle emission:
         // STRICT CONDITION: Only emit if sand actually moves (not stuck open, not a noop, and has transferred sand)!
         // Stop emitting at progress 0.65 so in-flight particles hit the receiving sand surface cleanly before the gate shuts.
-        const hasSandTransfer = activeAction && (activeAction.delta_s > 0 || isCascading);
+        const sCurrent = engine.get(r, c);
+        const targetNextS = (activeAction && activeAction.state && activeAction.state[r]) ? Number(activeAction.state[r][c]) : null;
+        const hasSandTransfer = activeAction && (
+          (activeAction.delta_s > 0) ||
+          (targetNextS !== null && targetNextS < sCurrent) ||
+          isCascading
+        );
         if (isActive && !isNoop && !isStuckOpen && hasSandTransfer && progress > 0.15 && progress < 0.65) {
           const lowLevel = engine.get(r - 1, c);
           const targetSandH = (this.cellHeight - 28) * Math.min(1.0, lowLevel + (activeAction.delta_s || 0.5));
@@ -559,8 +577,7 @@ class CanvasRenderer {
       const gw = this.cellWidth - 16;
       const gh = this.rowGap - 6;
 
-      const actionType = activeAction ? (activeAction.action_type || activeAction.actionType) : null;
-      const isActive = actionType === "COLLECTOR_FLUSH" && activeAction.col === c;
+      const isActive = actionType === "COLLECTOR_FLUSH" && actionCol === c;
       const isNoop = isActive && Boolean(activeAction.is_noop);
       const shake = isNoop ? Math.sin(progress * Math.PI * 6) * 4 : 0;
       const slideFraction = (isActive && !isNoop) ? Math.sin(progress * Math.PI) : 0;
@@ -657,7 +674,9 @@ class CanvasRenderer {
 
       // Collector flush particle emission:
       // Target is the sand mound inside the collector basin
-      if (isActive && !isNoop && progress > 0.15 && progress < 0.65) {
+      const flushSand = engine.get(0, c);
+      const hasFlushTransfer = activeAction && ((activeAction.delta_s > 0) || flushSand > 0);
+      if (isActive && !isNoop && hasFlushTransfer && progress > 0.15 && progress < 0.65) {
         const currentSand = engine.getTotalSand();
         const maxSand = engine.numRows * 2 * 1.0;
         const evacuatedSand = Math.max(0, maxSand - currentSand);

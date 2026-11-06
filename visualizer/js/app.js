@@ -25,6 +25,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const playBtn = document.getElementById("playBtn");
       if (playBtn) {
         playBtn.textContent = isPlaying ? "⏸ Pause" : "▶ Play";
+        if (isPlaying) {
+          playBtn.classList.add("btn-playing");
+        } else {
+          playBtn.classList.remove("btn-playing");
+        }
       }
     },
     onGoalReached: (stepData) => {
@@ -51,6 +56,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const optCostDisplay = document.getElementById("optCostDisplay");
   const actionLog = document.getElementById("actionLog");
 
+  function renderMathFormulas() {
+    if (typeof renderMathInElement === "function") {
+      try {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false },
+            { left: "\\(", right: "\\)", display: false },
+            { left: "\\[", right: "\\]", display: true }
+          ],
+          throwOnError: false
+        });
+      } catch (err) {
+        console.warn("KaTeX auto-render notice:", err);
+      }
+    }
+  }
+
   // Tab Navigation
   tabBtns.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -64,6 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (targetId === "dashboardView") {
         dashboard.renderAll();
+      } else if (targetId === "theoryView") {
+        renderMathFormulas();
       }
     });
   });
@@ -455,4 +480,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize
   populatePresets();
   dashboard.renderAll();
+  setTimeout(renderMathFormulas, 200);
 });

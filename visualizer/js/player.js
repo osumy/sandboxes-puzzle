@@ -11,8 +11,8 @@ class TracePlayer {
     this.trace = null;
     this.currentStepIndex = 0;
     this.isPlaying = false;
-    this.playbackSpeed = 1.0; // 1x = 500ms per step
-    this.baseStepDuration = 500; // ms
+    this.playbackSpeed = 1.0; // 1x = 700ms per step for comfortable, visible animation
+    this.baseStepDuration = 700; // ms
 
     this.onStepChange = options.onStepChange || (() => {});
     this.onStateChange = options.onStateChange || (() => {});
