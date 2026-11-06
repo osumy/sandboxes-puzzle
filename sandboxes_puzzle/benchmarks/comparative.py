@@ -15,7 +15,8 @@ from sandboxes_puzzle.algorithms.uninformed import (
     IterativeDeepeningSearch,
 )
 from sandboxes_puzzle.algorithms.informed import (
-    GreedyBestFirstSearch,
+    GreedyStarSearch,
+    GreedyStar,
     AStarSearch,
     RecursiveBestFirstSearch,
 )
@@ -42,7 +43,7 @@ class ComparativeBenchmark:
             DepthFirstSearch(max_depth=35),
             UniformCostSearch(),
             IterativeDeepeningSearch(max_limit=14),
-            GreedyBestFirstSearch(self.heuristic),
+            GreedyStarSearch(),
             AStarSearch(self.heuristic),
             RecursiveBestFirstSearch(self.heuristic, max_expansions=15000),
         ]

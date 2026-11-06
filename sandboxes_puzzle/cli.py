@@ -18,7 +18,8 @@ from sandboxes_puzzle.algorithms.uninformed import (
     IterativeDeepeningSearch,
 )
 from sandboxes_puzzle.algorithms.informed import (
-    GreedyBestFirstSearch,
+    GreedyStarSearch,
+    GreedyStar,
     AStarSearch,
     RecursiveBestFirstSearch,
 )
@@ -38,7 +39,7 @@ def main():
     solve_parser = subparsers.add_parser("solve", help="Solve a puzzle state with an algorithm")
     solve_parser.add_argument(
         "--algo",
-        choices=["bfs", "dfs", "ucs", "ids", "greedy", "astar", "rbfs"],
+        choices=["bfs", "dfs", "ucs", "ids", "greedy", "greedystar", "astar", "rbfs"],
         default="astar",
         help="Algorithm to execute (default: astar)",
     )
@@ -99,7 +100,8 @@ def run_solve(args):
         "dfs": DepthFirstSearch(),
         "ucs": UniformCostSearch(),
         "ids": IterativeDeepeningSearch(),
-        "greedy": GreedyBestFirstSearch(heur),
+        "greedy": GreedyStarSearch(),
+        "greedystar": GreedyStarSearch(),
         "astar": AStarSearch(heur),
         "rbfs": RecursiveBestFirstSearch(heur),
     }

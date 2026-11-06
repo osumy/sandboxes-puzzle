@@ -30,7 +30,8 @@ from sandboxes_puzzle.algorithms.uninformed import (
     IterativeDeepeningSearch,
 )
 from sandboxes_puzzle.algorithms.informed import (
-    GreedyBestFirstSearch,
+    GreedyStarSearch,
+    GreedyStar,
     AStarSearch,
     RecursiveBestFirstSearch,
 )
@@ -100,7 +101,8 @@ class SandboxesAPIHandler(SimpleHTTPRequestHandler):
         algos = [
             ("astar", AStarSearch(heur)),
             ("ucs", UniformCostSearch()),
-            ("greedy", GreedyBestFirstSearch(heur)),
+            ("greedystar", GreedyStarSearch()),
+            ("greedy", GreedyStarSearch()),
             ("bfs", BreadthFirstSearch()),
             ("dfs", DepthFirstSearch(max_depth=35)),
             ("ids", IterativeDeepeningSearch(max_limit=20)),

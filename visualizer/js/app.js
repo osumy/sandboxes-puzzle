@@ -142,9 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
     algoSelect.innerHTML = "";
     if (currentPresetKey === "professor_case") {
       const options = [
-        { key: "side_gate_45", label: "Side-Gate Solution (Cost 45)" },
-        { key: "alternative_46", label: "Alternative Solution (Cost 46)" },
-        { key: "greedy_47", label: "Greedy Best-First (Cost 47)" },
+        { key: "side_gate_45", label: "Side Gates Approach (Optimum - Cost 45)" },
+        { key: "alternative_46", label: "Other Alternative (Cost 46)" },
+        { key: "greedy_47", label: "GreedyStar (Cost 47)" },
         { key: "optimal_ucs_50", label: "UCS Baseline (Cost 50)" },
         { key: "astar_50", label: "A* Optimal (Cost 50)" },
       ];
@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const options = [
         { key: "astar", label: "A* Search (Optimal)" },
         { key: "ucs", label: "Uniform Cost Search (UCS)" },
-        { key: "greedy", label: "Greedy Best-First" },
+        { key: "greedystar", label: "GreedyStar" },
         { key: "bfs", label: "Breadth-First Search (BFS)" },
         { key: "dfs", label: "Depth-First Search (DFS)" },
         { key: "ids", label: "Iterative Deepening Search (IDS)" },
@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const options = [
         { key: "astar", label: "A* Search (Optimal: Cost 52.0, Uses Side-Gate)" },
         { key: "ucs", label: "Uniform Cost Search (UCS: Cost 52.0, 1742 Nodes)" },
-        { key: "greedy", label: "Greedy Best-First (Trap: Cost 54.0, Misses Side-Gate)" },
+        { key: "greedystar", label: "GreedyStar" },
         { key: "bfs", label: "Breadth-First Search (BFS: Cost 52.0)" },
         { key: "dfs", label: "Depth-First Search (DFS: Wild Detour, Cost 87.0)" },
         { key: "ids", label: "Iterative Deepening Search (IDS: Cost 52.0)" },
@@ -192,18 +192,19 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (currentPresetKey === "custom_generated") {
       const preset = window.SANDBOX_DATA.presets["custom_generated"];
       if (preset && preset.traces) {
-        const order = ["astar", "ucs", "greedy", "bfs", "dfs", "ids", "rbfs"];
+        const order = ["astar", "ucs", "greedystar", "bfs", "dfs", "ids", "rbfs"];
         const titles = {
           astar: "A* Search (Optimal)",
           ucs: "Uniform Cost Search (UCS)",
-          greedy: "Greedy Best-First",
+          greedystar: "GreedyStar",
+          greedy: "GreedyStar",
           bfs: "Breadth-First Search (BFS)",
           dfs: "Depth-First Search (DFS)",
           ids: "Iterative Deepening Search (IDS)",
           rbfs: "Recursive Best-First Search (RBFS)"
         };
         order.forEach(key => {
-          const tr = preset.traces[key];
+          const tr = preset.traces[key] || (key === "greedystar" ? preset.traces["greedy"] : null);
           if (tr) {
             const label = `${titles[key] || tr.algorithm} (Cost: ${tr.total_cost.toFixed(1)}, ${tr.path_length} steps, ${tr.execution_time_ms.toFixed(1)}ms)`;
             const opt = document.createElement("option");
@@ -235,6 +236,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let trace = preset.traces[currentAlgorithmKey];
     if (!trace) {
+      if (currentAlgorithmKey === "greedystar" && preset.traces["greedy"]) {
+        trace = preset.traces["greedy"];
+      } else if (currentAlgorithmKey === "greedy" && preset.traces["greedystar"]) {
+        trace = preset.traces["greedystar"];
+      }
+    }
+    if (!trace) {
       const keys = Object.keys(preset.traces);
       if (keys.length > 0) {
         currentAlgorithmKey = keys[0];
@@ -248,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
       populateActionLog(trace.steps);
       if (optCostDisplay) {
         if (currentPresetKey === "professor_case") {
-          optCostDisplay.textContent = "50.0";
+          optCostDisplay.textContent = "45.0";
         } else if (currentPresetKey === "side_gate_trap") {
           optCostDisplay.textContent = "52.0";
         } else if (currentPresetKey === "custom_generated") {

@@ -106,7 +106,7 @@ class BenchmarkDashboard {
     ctx.fillStyle = "#94a3b8";
     ctx.font = "600 11px monospace";
     ctx.textAlign = "center";
-    ctx.fillText("Cost by Greedy Solution (x)", padL + plotW / 2, h - 8);
+    ctx.fillText("Cost by GreedyStar Solution (x)", padL + plotW / 2, h - 8);
 
     ctx.save();
     ctx.translate(14, padT + plotH / 2);
@@ -288,7 +288,7 @@ class BenchmarkDashboard {
     ctx.fillStyle = "#94a3b8";
     ctx.font = "600 11px monospace";
     ctx.textAlign = "center";
-    ctx.fillText("Greedy_opt_ratio = (Greedy Cost) / (Optimum Cost)", padL + plotW / 2, h - 6);
+    ctx.fillText("GreedyStar_opt_ratio = (GreedyStar Cost) / (Optimum Cost)", padL + plotW / 2, h - 6);
   }
 
   /**

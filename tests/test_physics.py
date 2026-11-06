@@ -199,11 +199,17 @@ class TestVerticalTransferPhysics:
         # Now open gate 1->0
         act_1_0 = GateAction.top_down(row=1, col=0, s_before=1.0, s_after=0.0, delta_s=1.0)
         s2, cost2 = SandboxesEnv.apply_action(s1, act_1_0)
-        # Both cells poured down simultaneously!
+        # Both cells poured down simultaneously, maintaining the continuous cascade channel!
         assert s2.get(0, 0) == 1.0
         assert s2.get(1, 0) == 1.0
         assert s2.get(2, 0) == 0.0
-        assert len(s2.open_gates) == 0
+        assert (1, 0) in s2.open_gates
+
+        # Flush row 0 to collector basin - all contiguous channel sand drains
+        s3, cost3 = SandboxesEnv.apply_action(s2, GateAction.collector_flush(0, 1.0))
+        assert s3.get(0, 0) == 0.0
+        assert s3.get(1, 0) == 0.0
+        assert len(s3.open_gates) == 0
 
     def test_collector_flush_cascade_with_stuck_gate(self):
         """When gate 1->0 is stuck open and collector flush is opened, both cells empty into basin."""

@@ -100,59 +100,53 @@ def generate_professor_benchmark_presets() -> Dict[str, Any]:
     res_astar = astar.solve(bench)
     astar_trace = format_trace(bench, res_astar)
 
-    # Greedy Best-First trace (cost 47)
-    # The greedy sequence explores heuristic-attractive equalizations
+    # GreedyStar trace (cost 47.0):
+    # Column 0: 5 + 5 + 9 + 5 = 24.0 | Column 1: 9 + 9 + 5 = 23.0 ==> Total 47.0 (7 actions)
     greedy_steps_def = [
-        # Action sequence trapped by local heuristics producing cost 47:
-        # 3 side gates (3*1=3) + 3 half transfers (3*3=9) + 7 full transfers (7*5=35) = 47
-        ("b", 2, None),     # Side gate row 2: cost 1
-        ("b", 1, None),     # Side gate row 1: cost 1
-        ("b", 0, None),     # Side gate row 0: cost 1
-        ("flush", 0, 0),    # Flush (0, 0): cost 3
-        ("flush", 0, 1),    # Flush (0, 1): cost 3
-        ("drop", 1, 0),     # Drop 1->0 col 0: cost 3
-        ("flush", 0, 0),    # Flush (0, 0): cost 3
-        ("drop", 2, 0),     # Drop 2->1 col 0: cost 5
-        ("drop", 1, 0),     # Drop 1->0 col 0: cost 5
-        ("flush", 0, 0),    # Flush (0, 0): cost 5
-        ("drop", 3, 0),     # Drop 3->2 col 0: cost 5
-        ("drop", 2, 0),     # Drop 2->1 col 0: cost 5
-        ("drop", 1, 0),     # Drop 1->0 col 0: cost 5
-        ("flush", 0, 0),    # Flush (0, 0): cost 5
-        ("drop", 1, 1),     # Drop 1->0 col 1: cost 3
+        # Column 0 (Left): 5 + 5 + 9 + 5 = 24.0
+        ("drop", 3, 0),     # Drop 3->2 col 0: cost 5.0
+        ("drop", 2, 0),     # Drop 2->1 col 0: cost 5.0
+        ("drop", 1, 0),     # Drop 1->0 col 0: cost 9.0 (latch stuck open)
+        ("flush", 0, 0),    # Flush col 0: cost 5.0 (empties row 0 & cascades row 1 into collector)
+        # Column 1 (Right): 9 + 9 + 5 = 23.0
+        ("drop", 2, 1),     # Drop 2->1 col 1: cost 9.0 (latch stuck open)
+        ("drop", 1, 1),     # Drop 1->0 col 1: cost 9.0 (cascade flow channel)
+        ("flush", 0, 1),    # Flush col 1: cost 5.0 (empties row 0 & cascades row 2 & 1 into collector)
     ]
 
-    # Side-gate solution (cost 45):
-    # 1 side gate (1*1=1) + 3 half transfers (3*3=9) + 7 full transfers (7*5=35) = 45
+    # Side-gate solution (cost 45.0):
+    # Side gates: 1 + 1 = 2.0 | Column 1: 3 + 5 + 5 = 13.0 | Column 0: 7 + 9 + 9 + 5 = 30.0 ==> Total 45.0 (9 actions)
     side_gate_45_def = [
-        ("b", 2, None),     # Side gate row 2: cost 1
-        ("flush", 0, 0),    # Flush (0, 0): cost 5
-        ("drop", 1, 1),     # Drop 1->0 col 1: cost 5
-        ("flush", 0, 1),    # Flush (0, 1): cost 5
-        ("drop", 2, 0),     # Drop 2->1 col 0: cost 3
-        ("drop", 1, 0),     # Drop 1->0 col 0: cost 3
-        ("flush", 0, 0),    # Flush (0, 0): cost 3
-        ("drop", 3, 0),     # Drop 3->2 col 0: cost 5
-        ("drop", 2, 0),     # Drop 2->1 col 0: cost 5
-        ("drop", 1, 0),     # Drop 1->0 col 0: cost 5
-        ("flush", 0, 0),    # Flush (0, 0): cost 5
+        # Side gates: 1 + 1 = 2.0
+        ("b", 2, None),     # Side gate row 2: [0, 1] -> [0.5, 0.5], cost 1.0
+        ("b", 1, None),     # Side gate row 1: [0, 1] -> [0.5, 0.5], cost 1.0
+        # Column 1 (Right): 3 + 5 + 5 = 13.0
+        ("drop", 2, 1),     # Drop 2->1 col 1: 0.5 into 0.5 -> cost 3.0
+        ("drop", 1, 1),     # Drop 1->0 col 1: 1.0 into 0.0 -> cost 5.0
+        ("flush", 0, 1),    # Flush col 1: 1.0 into collector -> cost 5.0
+        # Column 0 (Left): 7 + 9 + 9 + 5 = 30.0
+        ("drop", 3, 0),     # Drop 3->2 col 0: 1.0 into 0.5 -> cost 7.0 (row 3 keeps 0.5)
+        ("drop", 2, 0),     # Drop 2->1 col 0: row 2 (1.0) into row 1 (0.5), row 3 (0.5) cascades into row 2 -> cost 9.0
+        ("drop", 1, 0),     # Drop 1->0 col 0: row 1 (1.0) into row 0 (1.0) -> blocked, cost 9.0 (latch stuck open)
+        ("flush", 0, 0),    # Flush col 0: 1.0 into collector -> cost 5.0 (open channel cascades into collector)
     ]
 
-    # Alternative solution (cost 46):
-    # 2 side gates (2*1=2) + 3 half transfers (3*3=9) + 7 full transfers (7*5=35) = 46
+    # Alternative solution (cost 46.0):
+    # Side gates: 1 + 1 = 2.0 | Column 1: 3 + 5 + 5 = 13.0 | Column 0: 3 + 5 + 9 + 9 + 5 = 31.0 ==> Total 46.0 (10 actions)
     alt_46_def = [
-        ("b", 2, None),     # Side gate row 2: cost 1
-        ("b", 1, None),     # Side gate row 1: cost 1
-        ("flush", 0, 0),    # Flush (0, 0): cost 5
-        ("drop", 1, 1),     # Drop 1->0 col 1: cost 5
-        ("flush", 0, 1),    # Flush (0, 1): cost 5
-        ("drop", 2, 0),     # Drop 2->1 col 0: cost 3
-        ("drop", 1, 0),     # Drop 1->0 col 0: cost 3
-        ("flush", 0, 0),    # Flush (0, 0): cost 3
-        ("drop", 3, 0),     # Drop 3->2 col 0: cost 5
-        ("drop", 2, 0),     # Drop 2->1 col 0: cost 5
-        ("drop", 1, 0),     # Drop 1->0 col 0: cost 5
-        ("flush", 0, 0),    # Flush (0, 0): cost 5
+        # Side gates: 1 + 1 = 2.0
+        ("b", 2, None),     # Side gate row 2: [0, 1] -> [0.5, 0.5], cost 1.0
+        ("b", 1, None),     # Side gate row 1: [0, 1] -> [0.5, 0.5], cost 1.0
+        # Column 1 (Right): 3 + 5 + 5 = 13.0
+        ("drop", 2, 1),     # Drop 2->1 col 1: 0.5 into 0.5 -> cost 3.0
+        ("drop", 1, 1),     # Drop 1->0 col 1: 1.0 into 0.0 -> cost 5.0
+        ("flush", 0, 1),    # Flush col 1: 1.0 into collector -> cost 5.0
+        # Column 0 (Left): 3 + 5 + 9 + 9 + 5 = 31.0
+        ("drop", 2, 0),     # Drop 2->1 col 0: 0.5 into 0.5 -> cost 3.0 (row 2 becomes empty)
+        ("drop", 3, 0),     # Drop 3->2 col 0: 1.0 into 0.0 -> cost 5.0 (row 3 becomes empty)
+        ("drop", 2, 0),     # Drop 2->1 col 0: 1.0 into 1.0 -> blocked, cost 9.0
+        ("drop", 1, 0),     # Drop 1->0 col 0: 1.0 into 1.0 -> blocked, cost 9.0 (latch stuck open)
+        ("flush", 0, 0),    # Flush col 0: 1.0 into collector -> cost 5.0 (open channel cascades into collector)
     ]
 
     def build_custom_trace(algo_name: str, total_c: float, def_steps: list) -> Dict[str, Any]:
@@ -203,9 +197,9 @@ def generate_professor_benchmark_presets() -> Dict[str, Any]:
     return {
         "initial_state": bench.to_list(top_to_bottom=False),
         "traces": {
-            "side_gate_45": build_custom_trace("Side-Gate (Cost 45)", 45.0, side_gate_45_def),
-            "alternative_46": build_custom_trace("Alternative (Cost 46)", 46.0, alt_46_def),
-            "greedy_47": build_custom_trace("Greedy (Cost 47)", 47.0, greedy_steps_def),
+            "side_gate_45": build_custom_trace("Side Gates Approach (Optimum - Cost 45)", 45.0, side_gate_45_def),
+            "alternative_46": build_custom_trace("Other Alternative (Cost 46)", 46.0, alt_46_def),
+            "greedy_47": build_custom_trace("GreedyStar (Cost 47)", 47.0, greedy_steps_def),
             "optimal_ucs_50": ucs_trace,
             "astar_50": astar_trace,
         }
@@ -240,7 +234,10 @@ def generate_side_gate_trap_presets() -> Dict[str, Any]:
     traces: Dict[str, Any] = {}
     for algo in algos:
         res = algo.solve(st)
-        traces[algo.name.lower().replace("*", "star")] = format_trace(st, res)
+        key = algo.name.lower().replace("*", "star")
+        traces[key] = format_trace(st, res)
+    if "greedystar" in traces and "greedy" not in traces:
+        traces["greedy"] = traces["greedystar"]
     return {
         "initial_state": st.to_list(top_to_bottom=False),
         "traces": traces,
@@ -283,7 +280,10 @@ def generate_and_export_all_data(output_path: Path) -> Dict[str, Any]:
     ]
     for algo in sample_algos:
         res = algo.solve(sample_state)
-        sample_traces[algo.name.lower().replace("*", "star")] = format_trace(sample_state, res)
+        key = algo.name.lower().replace("*", "star")
+        sample_traces[key] = format_trace(sample_state, res)
+    if "greedystar" in sample_traces and "greedy" not in sample_traces:
+        sample_traces["greedy"] = sample_traces["greedystar"]
 
     payload = {
         "meta": {

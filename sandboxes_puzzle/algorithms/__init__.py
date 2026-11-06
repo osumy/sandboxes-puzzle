@@ -8,6 +8,8 @@ from .uninformed import (
     IterativeDeepeningSearch,
 )
 from .informed import (
+    GreedyStarSearch,
+    GreedyStar,
     GreedyBestFirstSearch,
     AStarSearch,
     RecursiveBestFirstSearch,
@@ -21,6 +23,8 @@ __all__ = [
     "DepthFirstSearch",
     "UniformCostSearch",
     "IterativeDeepeningSearch",
+    "GreedyStarSearch",
+    "GreedyStar",
     "GreedyBestFirstSearch",
     "AStarSearch",
     "RecursiveBestFirstSearch",

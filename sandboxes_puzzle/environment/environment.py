@@ -152,16 +152,14 @@ class SandboxesEnv:
             s_prime = round(s - delta, 4)
             grid_list[r][c] = s_prime
             grid_list[r - 1][c] = round(low + delta, 4)
-            cost = 1.0 + 4.0 * (s + s_prime)
 
-            # Gate (r, c) itself has opened and closed
-            new_open_gates.discard((r, c))
-
-            # Cascade: if any contiguous gates above r are stuck open, their sand cascades down!
+            # Check if any contiguous gates above r are stuck open in this column
             m = r
             while m + 1 < n and (m + 1, c) in new_open_gates:
                 m += 1
+
             if m > r:
+                # Contiguous channel above r flows down into r and lower channel
                 channel_rows = list(range(r, m + 1))
                 total_sand_in_channel = sum(grid_list[row_idx][c] for row_idx in channel_rows)
                 rem = round(total_sand_in_channel, 4)
@@ -169,8 +167,16 @@ class SandboxesEnv:
                     fill = min(1.0, rem)
                     grid_list[row_idx][c] = fill
                     rem = round(rem - fill, 4)
-                for row_idx in range(r + 1, m + 1):
-                    new_open_gates.discard((row_idx, c))
+                s_final = grid_list[r][c]
+                cost = 1.0 + 4.0 * (s + s_final)
+                # Gate (r, c) remains open as part of the open cascading channel
+                new_open_gates.add((r, c))
+            else:
+                cost = 1.0 + 4.0 * (s + s_prime)
+                if s_prime > 0.0:
+                    new_open_gates.add((r, c))
+                else:
+                    new_open_gates.discard((r, c))
 
             return PuzzleState(grid_list, new_open_gates), cost
 

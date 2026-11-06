@@ -19,14 +19,14 @@ An advanced Artificial Intelligence search and optimization system for the **San
   - Side gate equalizations $(1.0, 0.0) \to (0.5, 0.5)$ at fixed cost $C_b = 1.0$.
 - **7 Classical Search Algorithms (AIMA Standard)**:
   - **Uninformed**: Breadth-First Search (BFS), Depth-First Search with cycle prevention (DFS), Uniform-Cost Search (UCS / Dijkstra), Iterative Deepening Search (IDS).
-  - **Informed**: Greedy Best-First Search, A\* Search, Recursive Best-First Search (RBFS).
+  - **Informed**: GreedyStar Search (column-wise top-down evacuation), A\* Search, Recursive Best-First Search (RBFS).
 - **Admissible & Consistent Heuristics**:
   - $h_1(s)$: Total sand volume lower bound ($5.0 \cdot M$).
   - $h_2(s)$: Row-distance weighted evacuation lower bound ($5.0 \sum r s_{r, c}$).
   - $h_3(s)$: Combined admissible and consistent composite lower bound ($5.0 \sum (r+1) s_{r, c}$).
 - **Full State Space Ground-Truth Evaluation**:
   - Backward Dijkstra computes exact optimal costs for all **59,049 states in 0.364 seconds**.
-  - Complete statistical evaluations of Greedy suboptimality ratio, Scatter Plot 1, Scatter Plot 2, and Histogram.
+  - Complete statistical evaluations of GreedyStar ratio, Scatter Plot 1, Scatter Plot 2, and Histogram.
 - **Standalone Interactive Web Visualizer (`visualizer/`)**:
   - Vanilla HTML5 Canvas, modern CSS tokens, ES6 JavaScript.
   - Zero external dependencies or npm build steps—works instantly via `file:///` or any local HTTP server.
@@ -84,8 +84,8 @@ python -m sandboxes_puzzle.cli solve --case professor --algo astar
 # Solve a random 5-row puzzle using UCS
 python -m sandboxes_puzzle.cli solve --case random --rows 5 --seed 42 --algo ucs
 
-# Compare with Greedy Best-First
-python -m sandboxes_puzzle.cli solve --case professor --algo greedy
+# Compare with GreedyStar
+python -m sandboxes_puzzle.cli solve --case professor --algo greedystar
 ```
 
 ### Run the 7-Algorithm Comparative Benchmark
@@ -110,7 +110,7 @@ Results averaged across random 5-row puzzle configurations:
 | **DFS** | 85.0 | 23.2 | 23.2 | 91.3 | 2.49 ms | 0.04 MB | 0.0% |
 | **UCS** | 54.8 | 12.4 | 3,764.6 | 4,298.1 | 563.66 ms | 2.48 MB | **YES (100%)** |
 | **IDS** | 54.8 | 9.8 | 20,891.6 | 27,425.4 | 3,854.02 ms | 1.08 MB | 80.0% |
-| **Greedy** | 55.8 | 12.8 | 12.8 | 38.2 | 2.12 ms | 0.02 MB | 80.0% |
+| **GreedyStar** | 47.1 | 7.7 | 7.7 | 8.7 | 0.19 ms | 0.004 MB | 0.0% |
 | **A\*** | 54.8 | 12.4 | 412.5 | 815.3 | 98.45 ms | 0.58 MB | **YES (100%)** |
 | **RBFS** | 54.8 | 9.8 | 6,551.0 | 17,169.6 | 940.46 ms | 0.02 MB | **YES (100%)** |
 
@@ -134,7 +134,7 @@ sandboxes-puzzle/
 │   ├── algorithms/             # R2: Russell & Norvig search implementations
 │   │   ├── base.py             # Node, SearchResult, SearchAlgorithm ABC
 │   │   ├── uninformed/         # BFS, DFS, UCS, IDS
-│   │   └── informed/           # Greedy, A*, RBFS
+│   │   └── informed/           # GreedyStar, A*, RBFS
 │   ├── heuristics/             # R2: Heuristic lower bounds & proofs
 │   │   ├── sand_volume.py      # h1: Sand volume lower bound
 │   │   ├── row_distance.py     # h2: Row distance lower bound

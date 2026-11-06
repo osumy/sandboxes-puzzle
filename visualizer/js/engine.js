@@ -109,10 +109,7 @@ class SandboxesEngine {
     this.grid[row][col] = sPrime;
     this.grid[row - 1][col] = Math.round((low + delta) * 10) / 10;
 
-    const cost = 1.0 + 4.0 * (s + sPrime);
-    this.cumulativeCost += cost;
-    this.stepCount += 1;
-    this.openGates.delete(`${row},${col}`);
+    let cost = 1.0 + 4.0 * (s + sPrime);
 
     // Check if any open gates above row r cascade downward
     let m = row;
@@ -132,10 +129,17 @@ class SandboxesEngine {
         this.grid[rIdx][col] = fill;
         rem = Math.round((rem - fill) * 10) / 10;
       }
-      for (let rIdx = row + 1; rIdx <= m; rIdx++) {
-        this.openGates.delete(`${rIdx},${col}`);
+      cost = 1.0 + 4.0 * (s + this.grid[row][col]);
+      this.openGates.add(`${row},${col}`);
+    } else {
+      if (sPrime > 0.0) {
+        this.openGates.add(`${row},${col}`);
+      } else {
+        this.openGates.delete(`${row},${col}`);
       }
     }
+    this.cumulativeCost += cost;
+    this.stepCount += 1;
 
     return {
       actionType: "TOP_DOWN",
