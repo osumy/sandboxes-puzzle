@@ -1,8 +1,8 @@
 # Sandboxes Puzzle (معمای جعبه‌های شن)
 
-[![CI - Test Suite](https://img.shields.io/badge/pytest-38%20passed-brightgreen.svg)](tests/)
+[![CI - Test Suite](https://img.shields.io/badge/pytest-39%20passed-brightgreen.svg)](tests/)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](pyproject.toml)
-[![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
+[![Documentation](https://img.shields.io/badge/docs-Persian%20%26%20English-blueviolet.svg)](PROBLEM_SPEC_FA.md)
 [![Zero Dependency Visualizer](https://img.shields.io/badge/visualizer-vanilla%20HTML5%2FCSS%2FJS-orange.svg)](visualizer/)
 
 An advanced Artificial Intelligence search and optimization system for the **Sandboxes Puzzle (معمای جعبه‌های شن)**, implementing both uninformed and informed search algorithms following Russell & Norvig's *Artificial Intelligence: A Modern Approach (AIMA)* standard. Includes full state space analysis ($3^{10} = 59,049$ states), proofs of admissibility and consistency, and an interactive, zero-dependency modern HTML5 Canvas web visualizer.
@@ -123,7 +123,8 @@ sandboxes-puzzle/
 ├── pyproject.toml              # Packaging and dependency configuration
 ├── requirements.txt            # Minimal runtime & testing dependencies
 ├── README.md                   # Project overview & CLI usage
-├── REPORT.md                   # Comprehensive academic research report
+├── REPORT.md                   # Comprehensive academic research report (English)
+├── PROBLEM_SPEC_FA.md          # مستند جامع و رسمی شرح مسئله و تحلیل فیزیکی (Persian)
 ├── sandboxes_puzzle/           # Core Python package
 │   ├── cli.py                  # Unified command-line interface
 │   ├── environment/            # R1: State representation and physics

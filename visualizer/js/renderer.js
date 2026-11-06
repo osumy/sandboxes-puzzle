@@ -85,11 +85,11 @@ class CanvasRenderer {
     // 1. Draw Collector Basin underneath Row 0
     this.drawCollectorBasin(engine);
 
-    // 2. Draw Grid Cells & Sand Fills
+    // 2. Draw Grid Cells & Sand Fills (with dynamic interpolation during animation)
     for (let r = 0; r < n; r++) {
       for (let c = 0; c < 2; c++) {
         const pos = getCellPos(r, c);
-        const fillLevel = engine.get(r, c);
+        const fillLevel = this.getVisualSandLevel(engine, r, c, activeAction, progress);
         this.drawCell(pos.x, pos.y, r, c, fillLevel);
       }
     }
@@ -99,6 +99,42 @@ class CanvasRenderer {
 
     // 4. Update & Draw Sand Particles
     this.updateAndDrawParticles();
+  }
+
+  /**
+   * Compute smooth interpolated sand level during active gate animation.
+   */
+  getVisualSandLevel(engine, r, c, activeAction, progress) {
+    if (!activeAction || progress >= 1.0 || activeAction.is_noop) {
+      return engine.get(r, c);
+    }
+    const type = activeAction.action_type || activeAction.actionType;
+    if (type === "TOP_DOWN") {
+      if (activeAction.row === r && activeAction.col === c) {
+        const s0 = activeAction.s_before !== undefined ? activeAction.s_before : engine.get(r, c);
+        const s1 = activeAction.s_after !== undefined ? activeAction.s_after : engine.get(r, c);
+        return s0 + (s1 - s0) * progress;
+      }
+      if (activeAction.row - 1 === r && activeAction.col === c) {
+        const delta = activeAction.delta_s || 0;
+        const s1 = engine.get(r, c);
+        const s0 = Math.max(0, s1 - delta);
+        return s0 + delta * progress;
+      }
+    } else if (type === "COLLECTOR_FLUSH") {
+      if (r === 0 && activeAction.col === c) {
+        const s0 = activeAction.s_before !== undefined ? activeAction.s_before : engine.get(0, c);
+        return s0 * (1.0 - progress);
+      }
+    } else if (type === "SIDE_GATE") {
+      if (activeAction.row === r && !activeAction.is_noop) {
+        const s0_0 = activeAction.s0_before !== undefined ? activeAction.s0_before : 0.5;
+        const s0_1 = activeAction.s1_before !== undefined ? activeAction.s1_before : 0.5;
+        if (c === 0) return s0_0 + (0.5 - s0_0) * progress;
+        if (c === 1) return s0_1 + (0.5 - s0_1) * progress;
+      }
+    }
+    return engine.get(r, c);
   }
 
   drawCell(x, y, r, c, level) {
@@ -169,21 +205,29 @@ class CanvasRenderer {
       const gw = this.colGap;
       const gh = this.cellHeight - 20;
 
-      const isActive = activeAction && activeAction.action_type === "SIDE_GATE" && activeAction.row === r;
-      const openAmount = isActive ? Math.sin(progress * Math.PI) : 0;
+      const actionType = activeAction ? (activeAction.action_type || activeAction.actionType) : null;
+      const isActive = actionType === "SIDE_GATE" && activeAction.row === r;
+      const isNoop = isActive && Boolean(activeAction.is_noop);
+      const shake = isNoop ? Math.sin(progress * Math.PI * 6) * 4 : 0;
+      const openAmount = (isActive && !isNoop) ? Math.sin(progress * Math.PI) : 0;
 
       ctx.save();
       // Side Gate Frame
-      ctx.fillStyle = isActive ? "#10b981" : "#475569";
+      if (isNoop) {
+        ctx.fillStyle = "#ef4444"; // Warning red for ineffective/blocked action
+      } else {
+        ctx.fillStyle = isActive ? "#10b981" : "#475569";
+      }
       ctx.beginPath();
-      ctx.roundRect(gx + 4, gy + openAmount * (gh * 0.4), gw - 8, gh - openAmount * (gh * 0.4), 3);
+      ctx.roundRect(gx + 4 + shake, gy + openAmount * (gh * 0.4), gw - 8, gh - openAmount * (gh * 0.4), 3);
       ctx.fill();
 
       // Gate Icon / Arrows
       ctx.fillStyle = "#fff";
-      ctx.font = "10px sans-serif";
+      ctx.font = isNoop ? "bold 11px sans-serif" : "10px sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(openAmount > 0.3 ? "⇔" : "⇹", gx + gw / 2, gy + gh / 2 + 3);
+      const icon = isNoop ? "✕" : (openAmount > 0.3 ? "⇔" : "⇹");
+      ctx.fillText(icon, gx + gw / 2 + shake, gy + gh / 2 + 3);
 
       ctx.restore();
 
@@ -208,20 +252,34 @@ class CanvasRenderer {
         const gw = this.cellWidth - 20;
         const gh = this.rowGap;
 
-        const isActive = activeAction && activeAction.action_type === "TOP_DOWN" && activeAction.row === r && activeAction.col === c;
-        const openAmount = isActive ? Math.sin(progress * Math.PI) : 0;
+        const actionType = activeAction ? (activeAction.action_type || activeAction.actionType) : null;
+        const isActive = actionType === "TOP_DOWN" && activeAction.row === r && activeAction.col === c;
+        const isNoop = isActive && Boolean(activeAction.is_noop);
+        const shake = isNoop ? Math.sin(progress * Math.PI * 6) * 4 : 0;
+        const openAmount = (isActive && !isNoop) ? Math.sin(progress * Math.PI) : 0;
 
         ctx.save();
         // Sliding Drawer
-        ctx.fillStyle = isActive ? "#10b981" : "#475569";
+        if (isNoop) {
+          ctx.fillStyle = "#ef4444"; // Warning red for blocked/lower-full drawer
+        } else {
+          ctx.fillStyle = isActive ? "#10b981" : "#475569";
+        }
         ctx.beginPath();
-        // Slide right when open
-        ctx.roundRect(gx + openAmount * 25, gy + 4, gw - openAmount * 25, gh - 8, 3);
+        // Slide right when open, or shake when blocked
+        ctx.roundRect(gx + openAmount * 25 + shake, gy + 4, gw - openAmount * 25, gh - 8, 3);
         ctx.fill();
 
-        // Handle
-        ctx.fillStyle = "#cbd5e1";
-        ctx.fillRect(gx + gw / 2 - 8, gy + gh / 2 - 2, 16, 4);
+        // Handle or Blocked indicator
+        if (isNoop) {
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 10px monospace";
+          ctx.textAlign = "center";
+          ctx.fillText("BLOCKED", gx + gw / 2 + shake, gy + gh / 2 + 3);
+        } else {
+          ctx.fillStyle = "#cbd5e1";
+          ctx.fillRect(gx + gw / 2 - 8 + shake, gy + gh / 2 - 2, 16, 4);
+        }
 
         ctx.restore();
 
@@ -236,7 +294,7 @@ class CanvasRenderer {
         });
 
         // Emit particles during transfer
-        if (isActive && progress > 0.2 && progress < 0.85) {
+        if (isActive && !isNoop && progress > 0.2 && progress < 0.85) {
           this.emitParticles(gx + gw / 2, gy + gh, 2);
         }
       }
@@ -250,19 +308,26 @@ class CanvasRenderer {
       const gw = this.cellWidth - 20;
       const gh = this.rowGap;
 
-      const isActive = activeAction && activeAction.action_type === "COLLECTOR_FLUSH" && activeAction.col === c;
-      const openAmount = isActive ? Math.sin(progress * Math.PI) : 0;
+      const actionType = activeAction ? (activeAction.action_type || activeAction.actionType) : null;
+      const isActive = actionType === "COLLECTOR_FLUSH" && activeAction.col === c;
+      const isNoop = isActive && Boolean(activeAction.is_noop);
+      const shake = isNoop ? Math.sin(progress * Math.PI * 6) * 4 : 0;
+      const openAmount = (isActive && !isNoop) ? Math.sin(progress * Math.PI) : 0;
 
       ctx.save();
-      ctx.fillStyle = isActive ? "#38bdf8" : "#475569";
+      if (isNoop) {
+        ctx.fillStyle = "#ef4444";
+      } else {
+        ctx.fillStyle = isActive ? "#38bdf8" : "#475569";
+      }
       ctx.beginPath();
-      ctx.roundRect(gx + openAmount * 25, gy + 4, gw - openAmount * 25, gh - 8, 3);
+      ctx.roundRect(gx + openAmount * 25 + shake, gy + 4, gw - openAmount * 25, gh - 8, 3);
       ctx.fill();
 
       ctx.fillStyle = "#fff";
       ctx.font = "9px monospace";
       ctx.textAlign = "center";
-      ctx.fillText("FLUSH", gx + gw / 2, gy + gh / 2 + 3);
+      ctx.fillText(isNoop ? "EMPTY" : "FLUSH", gx + gw / 2 + shake, gy + gh / 2 + 3);
 
       ctx.restore();
 
@@ -276,7 +341,7 @@ class CanvasRenderer {
         h: gh,
       });
 
-      if (isActive && progress > 0.2 && progress < 0.85) {
+      if (isActive && !isNoop && progress > 0.2 && progress < 0.85) {
         this.emitParticles(gx + gw / 2, gy + gh, 3);
       }
     }

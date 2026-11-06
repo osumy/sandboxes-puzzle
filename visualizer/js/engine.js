@@ -79,6 +79,7 @@ class SandboxesEngine {
 
     return {
       actionType: "TOP_DOWN",
+      action_type: "TOP_DOWN",
       row,
       col,
       cost,
@@ -86,7 +87,7 @@ class SandboxesEngine {
       s_before: s,
       s_after: sPrime,
       is_noop: delta === 0,
-      description: `Drop(r=${row}->${row - 1}, c=${col})`
+      description: delta === 0 ? `Drop(r=${row}->${row - 1}, c=${col}) [Blocked: No-op]` : `Drop(r=${row}->${row - 1}, c=${col})`
     };
   }
 
@@ -106,6 +107,7 @@ class SandboxesEngine {
 
     return {
       actionType: "COLLECTOR_FLUSH",
+      action_type: "COLLECTOR_FLUSH",
       row: 0,
       col,
       cost,
@@ -113,7 +115,7 @@ class SandboxesEngine {
       s_before: s,
       s_after: 0.0,
       is_noop: s === 0,
-      description: `Flush(r=0, c=${col})`
+      description: s === 0 ? `Flush(r=0, c=${col}) [Empty: No-op]` : `Flush(r=0, c=${col})`
     };
   }
 
@@ -140,6 +142,7 @@ class SandboxesEngine {
 
     return {
       actionType: "SIDE_GATE",
+      action_type: "SIDE_GATE",
       row,
       col: null,
       cost,

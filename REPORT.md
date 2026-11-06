@@ -64,7 +64,18 @@ A partition gate isolates Column 0 and Column 1 at each row $r$:
 - **Cost**: Constant $C_b = \mathbf{1.0}$.
 - **Transfer Dynamics**: Equalization occurs if and only if one cell is full ($1.0$) and the opposing cell is empty ($0.0$):
   $$(1.0, 0.0) \xrightarrow{b} (0.5, 0.5), \quad (0.0, 1.0) \xrightarrow{b} (0.5, 0.5)$$
-- **Strict Inactivity Rule (No-op)**: For all other 7 configurations ($(1, 0.5), (0.5, 0), (0.5, 0.5), (1, 1), (0, 0)$), opening the gate produces zero transfer ($\Delta s = 0$) and leaves state unchanged.
+- **Strict Inactivity Rule (No-op)**: For all other 7 configurations ($(1, 0.5), (0.5, 0), (0.5, 0.5), (1, 1), (0, 0), (0, 0.5), (0.5, 1)$), opening the gate produces zero transfer ($\Delta s = 0$) and leaves state unchanged.
+  - *Mathematical Justification*: Equalizing between $1.0$ and $0.5$ (or $0.0$ and $0.5$) would produce continuous fractional values $0.75$ or $0.25$, violating the strict discrete 3-level state quantization $\Sigma = \{0.0, 0.5, 1.0\}$. Thus, such actions burn $1.0$ cost but are strict No-Ops.
+
+#### 4. The Non-Persistent Gate Principle & Vertical Stacking Invariant
+A natural physical question arises: *If both upper and lower cells are full ($s=1.0, s_{\text{low}}=1.0$), and the drawer gate between them is opened, does it stay open so that when the lower cell is later dumped, both cells evacuate together?*
+- **Algorithmic Answer**: **No, gates do not persist in an open state.**
+- **Proof by State-Space Cardinality**: In classical Russell & Norvig AI state-space formulation, the Markovian state representation is strictly $s \in \{0.0, 0.5, 1.0\}^{2n}$, yielding $|\Omega_5| = 59,049$ states. The state vector contains **no persistent gate-status variables** ($\text{GateOpen} \in \{0, 1\}$). If gates possessed persistent open/close states, the state space would expand by $2^{15} = 32,768$, exploding to $\approx 1.93 \times 10^9$ states.
+- **Physical Transition Dynamics**: Every gate operation is an **atomic, instantaneous pulse**. When opened, sand flows up to capacity ($\Delta s = \min(s, 1.0 - s_{\text{low}})$). Because the lower cell is full, available capacity is $\Delta_{\text{capacity}} = 0.0$. Thus, $\Delta s = 0.0$, a cost of $C = 1 + 4(1.0 + 1.0) = \mathbf{9.0}$ is incurred, and the gate **closes immediately**.
+- **Sequential Consequence**: When the lower cell is subsequently flushed in a later action, only the lower cell empties. The upper cell rests upon the already-closed intermediate gate and remains in place.
+- In all 7 search algorithms, this zero-transfer action is pruned as a suboptimal No-Op. In the interactive visualizer, it triggers a warning shake and explicit blocked notification.
+
+*(For the complete Persian specification, see [`PROBLEM_SPEC_FA.md`](PROBLEM_SPEC_FA.md)).*
 
 ### 2.3 Topological DAG Structure & Acyclicity Theorem
 

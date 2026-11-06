@@ -68,8 +68,13 @@
         <!-- Left: Canvas Sandbox -->
         <div class="canvas-card">
           <canvas id="sandCanvas"></canvas>
-          <p style="margin-top: 10px; font-size: 0.78rem; color: var(--text-dim);">
-            💡 Tip: In manual mode, click any top-down drawer or side gate divider to trigger discrete physical sand transfer.
+          <div id="manualFeedbackBanner" class="feedback-banner" style="display: none;">
+            <span id="feedbackIcon">ℹ️</span>
+            <span id="feedbackText"></span>
+          </div>
+          <p style="margin-top: 10px; font-size: 0.78rem; color: var(--text-dim); line-height: 1.4;">
+            💡 <strong>راهنما</strong>: در حالت دستی، روی هر دریچه عمودی، دریچه جانبی، یا خروجی مخزن کلیک کنید تا اکشن فیزیکی اجرا شود. 
+            <em>نکته فیزیکی مهم:</em> دریچه‌ها متغیر حالت ماندگار نیستند و باز نمی‌مانند؛ بلکه بلافاصله بسته می‌شوند.
           </p>
         </div>
 
@@ -228,6 +233,19 @@
         <p>
           Heuristic \(h_3(s) = 5.0 \sum_{r=0}^{n-1} \sum_{c \in \{0, 1\}} (r + 1) s_{r, c}\) is strictly admissible (\(h_3(s) \le h^*(s)\))
           and monotone/consistent across all 59,049 states, achieving significant search space reduction in A* while guaranteeing optimality.
+        </p>
+
+        <h3 style="margin-top: 16px; margin-bottom: 6px; color: var(--sand-light);">5. Vertical Stacking & Non-Persistent Gate Rule (عدم ماندگاری وضعیت باز بودن دریچه‌ها)</h3>
+        <p>
+          <strong>سوال متداول: اگر دو خانه بالا و پایین هر دو پر باشند (\(s=1.0, s_{\text{low}}=1.0\)) و دریچه بین آن‌ها باز شود، آیا دریچه باز می‌ماند تا با باز کردن دریچه پایینی، هر دو همزمان فرو بریزند؟</strong><br>
+          <em>پاسخ صریح و رسمی تئوری مارکوف و AIMA:</em> <strong>خیر!</strong> در فرمولاسیون فضای حالت معمای جعبه‌های شن، بردار حالت صرفاً شامل مقادیر شن در خانه‌هاست (\(s \in \{0, 0.5, 1\}^{2n}\)) و هیچ متغیر باینری برای «حالت باز یا بسته بودن دریچه‌ها» در فضای حالت وجود ندارد (اگر وجود داشت، فضا از ۵۹,۰۴۹ حالت به بیش از ۱.۹ میلیارد حالت منفجر می‌شد).<br>
+          طبق تعریف اکشن، هر کنش دریچه یک <strong>پالس گسسته و لحظه‌ای (Atomic Event)</strong> است: دریچه باز می‌شود، شن تا سقف گنجایش خانه مقصد منتقل می‌شود و دریچه <strong>بلافاصله بسته می‌شود</strong>. هنگامی که خانه پایین پر است، گنجایش خالی برابر ۰ است؛ هیچ شنی جابجا نمی‌شود (\(\Delta s = 0\))، هزینه سنگین \(1 + 4(1+1) = 9.0\) تلف شده و دریچه بی‌درنگ مسدود/بسته می‌شود. بنابراین با باز کردن بعدی خانه پایین، صرفاً همان خانه پایین خالی می‌شود و خانه بالا همچنان روی دریچه بسته قرار دارد. این اکشن در الگوریتم‌های جستجو یک <strong>No-Op هرس‌شونده</strong> است.
+        </p>
+
+        <h3 style="margin-top: 16px; margin-bottom: 6px; color: var(--sand-light);">6. Side-Gate Strict Inactivity on (0, 0.5) and (1, 0.5) (بی‌اثر بودن در حالات نامتقارن کسری)</h3>
+        <p>
+          <strong>آیا با باز کردن دریچه میانی بین خانه‌های با مقادیر \((0.0, 0.5)\) یا \((1.0, 0.5)\) انتقالی رخ می‌دهد؟</strong><br>
+          <em>پاسخ:</em> <strong>خیر، به هیچ وجه!</strong> طبق صریح دستورالعمل مسئله، اکشن \(b\) تنها و تنها در دو حالت متقارن معکوس \((1.0, 0.0)\) و \((0.0, 1.0)\) فعال شده و هر دو را به \((0.5, 0.5)\) تبدیل می‌کند. در تمام ۷ ترکیب دیگر اعم از \((0.0, 0.5)\)، \((1.0, 0.5)\)، \((0.5, 0.5)\)، \((1.0, 1.0)\) و \((0.0, 0.0)\)، باز کردن دریچه هیچ جابجایی ایجاد نمی‌کند (\(\Delta s = 0\))، ۱ واحد هزینه می‌سوزاند و وضعیت بدون تغییر باقی می‌ماند (No-Op). دلیل ریاضی این قانون، حفظ کوانتیزاسیون گسسته مقادیر در مجموعه \(\{0, 0.5, 1\}\) و جلوگیری از تولید مقادیر \(0.25\) یا \(0.75\) است.
         </p>
       </div>
     </section>

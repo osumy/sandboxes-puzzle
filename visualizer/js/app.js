@@ -244,6 +244,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Interactive Canvas Gate Clicks (Manual Mode)
+  let isManualAnimating = false;
+  let manualAnimId = null;
+
+  canvas.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const hit = renderer.getHitboxAt(mouseX, mouseY);
+    canvas.style.cursor = hit ? "pointer" : "default";
+  });
+
   canvas.addEventListener("click", (e) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
@@ -251,6 +262,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const hit = renderer.getHitboxAt(mouseX, mouseY);
     if (!hit) return;
+
+    if (player.isPlaying) {
+      player.pause();
+    }
+
+    // Inspect pre-action state for descriptive user guidance
+    let preInfo = { isBlocked: false, isEmpty: false, c0: 0, c1: 0, s: 0, low: 0 };
+    if (hit.type === "TOP_DOWN") {
+      preInfo.s = engine.get(hit.row, hit.col);
+      preInfo.low = engine.get(hit.row - 1, hit.col);
+      preInfo.isBlocked = preInfo.s > 0 && preInfo.low === 1.0;
+      preInfo.isEmpty = preInfo.s === 0.0;
+    } else if (hit.type === "SIDE_GATE") {
+      preInfo.c0 = engine.get(hit.row, 0);
+      preInfo.c1 = engine.get(hit.row, 1);
+    } else if (hit.type === "COLLECTOR_FLUSH") {
+      preInfo.s = engine.get(0, hit.col);
+      preInfo.isEmpty = preInfo.s === 0.0;
+    }
 
     let actionRes = null;
     if (hit.type === "COLLECTOR_FLUSH") {
@@ -262,21 +292,90 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (actionRes) {
-      triggerFloatingCost(hit.x + hit.w / 2, hit.y, actionRes.cost);
-      renderer.render(engine, actionRes, 1.0);
-      updateManualHUD(actionRes);
+      triggerFloatingCost(hit.x + hit.w / 2, hit.y, actionRes.cost, actionRes.is_noop);
+      showManualFeedback(hit, actionRes, preInfo);
+
+      // Smooth mechanical animation (380ms)
+      if (manualAnimId) {
+        cancelAnimationFrame(manualAnimId);
+      }
+      const animStart = performance.now();
+      const animDuration = 380;
+      isManualAnimating = true;
+
+      function stepManualAnimation(now) {
+        const elapsed = now - animStart;
+        const progress = Math.min(1.0, elapsed / animDuration);
+        renderer.render(engine, actionRes, progress);
+
+        if (progress < 1.0) {
+          manualAnimId = requestAnimationFrame(stepManualAnimation);
+        } else {
+          isManualAnimating = false;
+          manualAnimId = null;
+          renderer.render(engine, null, 1.0);
+          updateManualHUD(actionRes);
+        }
+      }
+      manualAnimId = requestAnimationFrame(stepManualAnimation);
     }
   });
 
-  function triggerFloatingCost(x, y, cost) {
+  function showManualFeedback(hit, actionRes, preInfo) {
+    const banner = document.getElementById("manualFeedbackBanner");
+    const iconEl = document.getElementById("feedbackIcon");
+    const textEl = document.getElementById("feedbackText");
+    if (!banner || !iconEl || !textEl) return;
+
+    banner.className = "feedback-banner";
+    banner.style.display = "flex";
+
+    if (hit.type === "TOP_DOWN") {
+      if (preInfo.isBlocked) {
+        banner.classList.add("warning");
+        iconEl.textContent = "⛔";
+        textEl.innerHTML = `<strong>مجرا مسدود است:</strong> خانه پایینی پر است (ظرفیت ۰)! هیچ شنی جابجا نشد. طبق قوانین معما، دریچه‌ها ماندگار نیستند و باز نمی‌مانند؛ بلکه بلافاصله بسته شدند (+${actionRes.cost.toFixed(1)} هزینه تلف شد).`;
+      } else if (preInfo.isEmpty) {
+        banner.classList.add("info");
+        iconEl.textContent = "⚠️";
+        textEl.innerHTML = `<strong>حرکت بی‌اثر:</strong> خانه بالایی خالی است و شنی برای ریختن وجود ندارد (+${actionRes.cost.toFixed(1)} هزینه).`;
+      } else {
+        banner.classList.add("success");
+        iconEl.textContent = "✅";
+        textEl.innerHTML = `<strong>انتقال عمودی:</strong> مقدار ${actionRes.delta_s.toFixed(1)} واحد شن از سطر ${hit.row} به سطر ${hit.row - 1} ریخته شد (+${actionRes.cost.toFixed(1)} هزینه). دریچه بسته شد.`;
+      }
+    } else if (hit.type === "SIDE_GATE") {
+      if (actionRes.is_noop) {
+        banner.classList.add("info");
+        iconEl.textContent = "⚠️";
+        textEl.innerHTML = `<strong>دریچه جانبی بی‌اثر (No-Op):</strong> در سطر ${hit.row} مقادیر (${preInfo.c0.toFixed(1)} و ${preInfo.c1.toFixed(1)}) هستند. طبق قانون مسئله، برابرسازی فقط بین (1 و 0) انجام می‌شود و در حالت‌هایی مانند (0, 0.5) یا (1, 0.5) شنی منتقل نمی‌شود (+${actionRes.cost.toFixed(1)} هزینه).`;
+      } else {
+        banner.classList.add("success");
+        iconEl.textContent = "✅";
+        textEl.innerHTML = `<strong>برابرسازی جانبی:</strong> دو خانه سطر ${hit.row} هر دو به ۰.۵ متوازن شدند (+${actionRes.cost.toFixed(1)} هزینه).`;
+      }
+    } else if (hit.type === "COLLECTOR_FLUSH") {
+      if (preInfo.isEmpty) {
+        banner.classList.add("info");
+        iconEl.textContent = "⚠️";
+        textEl.innerHTML = `<strong>تخلیه مخزن بی‌اثر:</strong> خانه سطر ۰ خالی است (+${actionRes.cost.toFixed(1)} هزینه).`;
+      } else {
+        banner.classList.add("success");
+        iconEl.textContent = "✅";
+        textEl.innerHTML = `<strong>تخلیه در مخزن:</strong> مقدار ${actionRes.delta_s.toFixed(1)} واحد شن به حوضچه انتهایی تخلیه شد (+${actionRes.cost.toFixed(1)} هزینه).`;
+      }
+    }
+  }
+
+  function triggerFloatingCost(x, y, cost, isNoop = false) {
     const badge = document.createElement("div");
-    badge.className = "floating-cost";
-    badge.textContent = `+${cost.toFixed(1)}`;
+    badge.className = isNoop ? "floating-cost noop" : "floating-cost";
+    badge.textContent = isNoop ? `+${cost.toFixed(1)} ⚠️` : `+${cost.toFixed(1)}`;
     const rect = canvas.getBoundingClientRect();
-    badge.style.left = `${rect.left + x - 15}px`;
+    badge.style.left = `${rect.left + x - 20}px`;
     badge.style.top = `${rect.top + y - 10}px`;
     document.body.appendChild(badge);
-    setTimeout(() => badge.remove(), 800);
+    setTimeout(() => badge.remove(), 850);
   }
 
   function updateManualHUD(actionRes) {
