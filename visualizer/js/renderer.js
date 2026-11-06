@@ -255,27 +255,43 @@ class CanvasRenderer {
         const actionType = activeAction ? (activeAction.action_type || activeAction.actionType) : null;
         const isActive = actionType === "TOP_DOWN" && activeAction.row === r && activeAction.col === c;
         const isNoop = isActive && Boolean(activeAction.is_noop);
+        const isStuckOpen = engine.openGates && engine.openGates.has(`${r},${c}`);
+        
+        let openFraction = 0;
+        if (isStuckOpen) {
+          openFraction = 1.0;
+        } else if (isActive && !isNoop) {
+          openFraction = Math.sin(progress * Math.PI);
+        }
+
         const shake = isNoop ? Math.sin(progress * Math.PI * 6) * 4 : 0;
-        const openAmount = (isActive && !isNoop) ? Math.sin(progress * Math.PI) : 0;
 
         ctx.save();
-        // Sliding Drawer
+        // Drawer color
         if (isNoop) {
-          ctx.fillStyle = "#ef4444"; // Warning red for blocked/lower-full drawer
+          ctx.fillStyle = "#ef4444"; // Warning red
+        } else if (isStuckOpen) {
+          ctx.fillStyle = "#f59e0b"; // Amber for latch stuck open
+        } else if (isActive) {
+          ctx.fillStyle = "#10b981"; // Emerald for active slide
         } else {
-          ctx.fillStyle = isActive ? "#10b981" : "#475569";
+          ctx.fillStyle = "#475569"; // Normal closed
         }
+
         ctx.beginPath();
-        // Slide right when open, or shake when blocked
-        ctx.roundRect(gx + openAmount * 25 + shake, gy + 4, gw - openAmount * 25, gh - 8, 3);
+        ctx.roundRect(gx + openFraction * 30 + shake, gy + 4, gw - openFraction * 30, gh - 8, 3);
         ctx.fill();
 
-        // Handle or Blocked indicator
+        // Handle or status label
+        ctx.fillStyle = "#fff";
         if (isNoop) {
-          ctx.fillStyle = "#fff";
-          ctx.font = "bold 10px monospace";
+          ctx.font = "bold 9px monospace";
           ctx.textAlign = "center";
-          ctx.fillText("BLOCKED", gx + gw / 2 + shake, gy + gh / 2 + 3);
+          ctx.fillText("EMPTY", gx + gw / 2 + shake, gy + gh / 2 + 3);
+        } else if (isStuckOpen) {
+          ctx.font = "bold 9px monospace";
+          ctx.textAlign = "center";
+          ctx.fillText("OPEN ⇊", gx + (gw - openFraction * 30) / 2, gy + gh / 2 + 3);
         } else {
           ctx.fillStyle = "#cbd5e1";
           ctx.fillRect(gx + gw / 2 - 8 + shake, gy + gh / 2 - 2, 16, 4);

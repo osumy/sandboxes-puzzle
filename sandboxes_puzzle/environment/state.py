@@ -15,21 +15,28 @@ VALID_SAND_LEVELS = {0.0, 0.5, 1.0}
 class PuzzleState:
     """
     Immutable representation of an n-row by 2-column Sandboxes Puzzle grid.
+    Supports persistent open gates from stuck mechanical spring-latches.
     
     Attributes:
         grid: Tuple of n 2-tuples representing rows from row 0 (bottom) to row n-1 (top).
         num_rows: Number of rows in the grid (n).
+        open_gates: Tuple of (row, col) coordinates of top-down gates currently stuck open.
     """
 
-    __slots__ = ("_grid", "_num_rows", "_hash", "_total_sand")
+    __slots__ = ("_grid", "_num_rows", "_open_gates", "_hash", "_total_sand")
 
-    def __init__(self, grid: Sequence[Sequence[float]]):
+    def __init__(
+        self,
+        grid: Sequence[Sequence[float]],
+        open_gates: Sequence[Tuple[int, int]] = (),
+    ):
         """
         Initialize an immutable PuzzleState.
         
         Args:
             grid: Sequence of rows from row 0 (bottom) to row n-1 (top),
                   where each row contains exactly 2 float values in {0.0, 0.5, 1.0}.
+            open_gates: Optional sequence of (row, col) pairs for gates currently stuck open.
         
         Raises:
             ValueError: If dimensions or sand levels are invalid.
@@ -52,12 +59,22 @@ class PuzzleState:
         if self._num_rows == 0:
             raise ValueError("PuzzleState must have at least 1 row.")
         self._total_sand: float = round(total, 4)
-        self._hash: int = hash(self._grid)
+        self._open_gates: Tuple[Tuple[int, int], ...] = tuple(sorted(set(open_gates)))
+        self._hash: int = hash((self._grid, self._open_gates))
 
     @property
     def grid(self) -> Tuple[Tuple[float, float], ...]:
         """Return the grid as a tuple of rows from bottom (0) to top (n-1)."""
         return self._grid
+
+    @property
+    def open_gates(self) -> Tuple[Tuple[int, int], ...]:
+        """Return tuple of currently stuck open top-down gates as (row, col) pairs."""
+        return self._open_gates
+
+    def is_gate_open(self, row: int, col: int) -> bool:
+        """Check if top-down gate between row and row-1 in col is open."""
+        return (row, col) in self._open_gates
 
     @property
     def num_rows(self) -> int:
@@ -151,9 +168,10 @@ class PuzzleState:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, PuzzleState):
             return False
-        return self._grid == other._grid
+        return self._grid == other._grid and self._open_gates == other._open_gates
 
     def __repr__(self) -> str:
         # Display from top row to bottom row for natural visual inspection
         row_strs = [f"r{r}: [{self._grid[r][0]}, {self._grid[r][1]}]" for r in range(self._num_rows - 1, -1, -1)]
-        return f"PuzzleState(n={self._num_rows}, sand={self._total_sand:.1f}, rows=[\n  " + "\n  ".join(row_strs) + "\n])"
+        gates_str = f", open_gates={self._open_gates}" if self._open_gates else ""
+        return f"PuzzleState(n={self._num_rows}, sand={self._total_sand:.1f}{gates_str}, rows=[\n  " + "\n  ".join(row_strs) + "\n])"

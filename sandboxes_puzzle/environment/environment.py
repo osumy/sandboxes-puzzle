@@ -108,6 +108,7 @@ class SandboxesEnv:
         """
         n = state.num_rows
         grid_list = [list(r) for r in state.grid]
+        new_open_gates = set(state.open_gates)
 
         if action.action_type == ActionType.COLLECTOR_FLUSH:
             c = action.col
@@ -116,7 +117,16 @@ class SandboxesEnv:
             s = grid_list[0][c]
             grid_list[0][c] = 0.0
             cost = 1.0 + 4.0 * s
-            return PuzzleState(grid_list), cost
+
+            # If top-down gates are stuck open above row 0 in this column,
+            # sand cascades down into the collector basin!
+            curr_r = 1
+            while curr_r < n and (curr_r, c) in new_open_gates:
+                grid_list[curr_r][c] = 0.0
+                new_open_gates.remove((curr_r, c))
+                curr_r += 1
+
+            return PuzzleState(grid_list, new_open_gates), cost
 
         elif action.action_type == ActionType.TOP_DOWN:
             r = action.row
@@ -127,13 +137,42 @@ class SandboxesEnv:
                 raise ValueError(f"Invalid column: {c}")
             
             s = grid_list[r][c]
-            cap = 1.0 - grid_list[r - 1][c]
+            low = grid_list[r - 1][c]
+
+            # Special Rule: If upper cell has sand and lower cell is completely full (1.0),
+            # the spring latch gets stuck open! No sand moves yet, cost is 1 + 4*(s + s).
+            if s > 0.0 and low == 1.0:
+                cost = 1.0 + 4.0 * (s + s)
+                new_open_gates.add((r, c))
+                return PuzzleState(grid_list, new_open_gates), cost
+
+            # Lower cell has room
+            cap = 1.0 - low
             delta = min(s, cap)
             s_prime = round(s - delta, 4)
             grid_list[r][c] = s_prime
-            grid_list[r - 1][c] = round(grid_list[r - 1][c] + delta, 4)
+            grid_list[r - 1][c] = round(low + delta, 4)
             cost = 1.0 + 4.0 * (s + s_prime)
-            return PuzzleState(grid_list), cost
+
+            # Gate (r, c) itself has opened and closed
+            new_open_gates.discard((r, c))
+
+            # Cascade: if any contiguous gates above r are stuck open, their sand cascades down!
+            m = r
+            while m + 1 < n and (m + 1, c) in new_open_gates:
+                m += 1
+            if m > r:
+                channel_rows = list(range(r, m + 1))
+                total_sand_in_channel = sum(grid_list[row_idx][c] for row_idx in channel_rows)
+                rem = round(total_sand_in_channel, 4)
+                for row_idx in channel_rows:
+                    fill = min(1.0, rem)
+                    grid_list[row_idx][c] = fill
+                    rem = round(rem - fill, 4)
+                for row_idx in range(r + 1, m + 1):
+                    new_open_gates.discard((row_idx, c))
+
+            return PuzzleState(grid_list, new_open_gates), cost
 
         elif action.action_type == ActionType.SIDE_GATE:
             r = action.row
@@ -145,7 +184,7 @@ class SandboxesEnv:
                 grid_list[r][1] = 0.5
             # Non-equalizing pairs remain unchanged (no-op)
             cost = 1.0
-            return PuzzleState(grid_list), cost
+            return PuzzleState(grid_list, new_open_gates), cost
 
         else:
             raise ValueError(f"Unknown action type: {action.action_type}")

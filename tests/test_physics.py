@@ -179,6 +179,44 @@ class TestVerticalTransferPhysics:
             assert cost in valid_costs
             assert int(cost) % 2 == 1
 
+    def test_stuck_open_gate_cascade(self):
+        """
+        Special Spring-Latch Rule:
+        When upper cell has sand (1.0 or 0.5) and lower cell is full (1.0),
+        opening the gate gets the latch stuck OPEN.
+        When the lower gate is subsequently opened, both cells cascade down together!
+        """
+        # Row 2 = 1.0, Row 1 = 1.0, Row 0 = 0.0
+        state = PuzzleState([(0.0, 0.0), (1.0, 0.0), (1.0, 0.0)])
+        
+        # Open gate 2->1 (blocked by lower cell full)
+        act_2_1 = GateAction.top_down(row=2, col=0, s_before=1.0, s_after=1.0, delta_s=0.0)
+        s1, cost1 = SandboxesEnv.apply_action(state, act_2_1)
+        assert cost1 == 9.0  # 1 + 4*(1.0 + 1.0)
+        assert (2, 0) in s1.open_gates
+        assert s1.get(2, 0) == 1.0 and s1.get(1, 0) == 1.0
+
+        # Now open gate 1->0
+        act_1_0 = GateAction.top_down(row=1, col=0, s_before=1.0, s_after=0.0, delta_s=1.0)
+        s2, cost2 = SandboxesEnv.apply_action(s1, act_1_0)
+        # Both cells poured down simultaneously!
+        assert s2.get(0, 0) == 1.0
+        assert s2.get(1, 0) == 1.0
+        assert s2.get(2, 0) == 0.0
+        assert len(s2.open_gates) == 0
+
+    def test_collector_flush_cascade_with_stuck_gate(self):
+        """When gate 1->0 is stuck open and collector flush is opened, both cells empty into basin."""
+        state = PuzzleState([(1.0, 0.0), (1.0, 0.0)])
+        s1, _ = SandboxesEnv.apply_action(state, GateAction.top_down(1, 0, 1.0, 1.0, 0.0))
+        assert (1, 0) in s1.open_gates
+
+        # Flush row 0 to collector basin
+        s2, _ = SandboxesEnv.apply_action(s1, GateAction.collector_flush(0, 1.0))
+        assert s2.get(0, 0) == 0.0
+        assert s2.get(1, 0) == 0.0
+        assert len(s2.open_gates) == 0
+
 
 class TestProfessorBenchmark:
     """Tests for the professor's 4-row benchmark case."""

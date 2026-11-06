@@ -18,12 +18,14 @@ class SandboxesEngine {
     }
     this.cumulativeCost = 0.0;
     this.stepCount = 0;
+    this.openGates = new Set(); // Stores "row,col" keys of gates stuck open by spring latch
   }
 
   clone() {
     const nextEngine = new SandboxesEngine(this.grid, this.numRows);
     nextEngine.cumulativeCost = this.cumulativeCost;
     nextEngine.stepCount = this.stepCount;
+    nextEngine.openGates = new Set(this.openGates);
     return nextEngine;
   }
 
@@ -36,6 +38,11 @@ class SandboxesEngine {
     }
     this.cumulativeCost = 0.0;
     this.stepCount = 0;
+    this.openGates.clear();
+  }
+
+  isGateOpen(row, col) {
+    return this.openGates.has(`${row},${col}`);
   }
 
   get(row, col) {
@@ -59,6 +66,8 @@ class SandboxesEngine {
 
   /**
    * Action a: Top-down vertical drop from row r to row r-1 in column c.
+   * Includes Special Spring-Latch Rule: if upper has sand and lower is full,
+   * gate gets stuck open and sand cascades when a lower gate subsequently opens.
    */
   executeTopDown(row, col) {
     if (row <= 0 || row >= this.numRows) {
@@ -66,6 +75,33 @@ class SandboxesEngine {
     }
     const s = this.grid[row][col];
     const low = this.grid[row - 1][col];
+
+    // Special Spring-Latch Rule:
+    // If upper box has sand (1.0 or 0.5) and lower box is full (1.0),
+    // drawer opens, sand cannot move immediately, and the latch gets stuck OPEN!
+    if (s > 0.0 && low === 1.0) {
+      const cost = 1.0 + 4.0 * (s + s);
+      this.cumulativeCost += cost;
+      this.stepCount += 1;
+      this.openGates.add(`${row},${col}`);
+
+      return {
+        actionType: "TOP_DOWN",
+        action_type: "TOP_DOWN",
+        row,
+        col,
+        cost,
+        delta_s: 0.0,
+        s_before: s,
+        s_after: s,
+        is_noop: false,
+        is_stuck_open: true,
+        cascade_occurred: false,
+        description: `Drop(r=${row}->${row - 1}, c=${col}) [Latch Stuck OPEN]`
+      };
+    }
+
+    // Lower box has available capacity
     const cap = 1.0 - low;
     const delta = Math.min(s, cap);
     const sPrime = Math.round((s - delta) * 10) / 10;
@@ -76,6 +112,30 @@ class SandboxesEngine {
     const cost = 1.0 + 4.0 * (s + sPrime);
     this.cumulativeCost += cost;
     this.stepCount += 1;
+    this.openGates.delete(`${row},${col}`);
+
+    // Check if any open gates above row r cascade downward
+    let m = row;
+    while (m + 1 < this.numRows && this.openGates.has(`${m + 1},${col}`)) {
+      m++;
+    }
+    let cascadeOccurred = false;
+    if (m > row) {
+      cascadeOccurred = true;
+      let totalSandInChannel = 0;
+      for (let rIdx = row; rIdx <= m; rIdx++) {
+        totalSandInChannel += this.grid[rIdx][col];
+      }
+      let rem = Math.round(totalSandInChannel * 10) / 10;
+      for (let rIdx = row; rIdx <= m; rIdx++) {
+        const fill = Math.min(1.0, rem);
+        this.grid[rIdx][col] = fill;
+        rem = Math.round((rem - fill) * 10) / 10;
+      }
+      for (let rIdx = row + 1; rIdx <= m; rIdx++) {
+        this.openGates.delete(`${rIdx},${col}`);
+      }
+    }
 
     return {
       actionType: "TOP_DOWN",
@@ -86,13 +146,18 @@ class SandboxesEngine {
       delta_s: delta,
       s_before: s,
       s_after: sPrime,
-      is_noop: delta === 0,
-      description: delta === 0 ? `Drop(r=${row}->${row - 1}, c=${col}) [Blocked: No-op]` : `Drop(r=${row}->${row - 1}, c=${col})`
+      is_noop: delta === 0 && s === 0,
+      is_stuck_open: false,
+      cascade_occurred: cascadeOccurred,
+      description: cascadeOccurred
+        ? `Drop(r=${row}->${row - 1}, c=${col}) [Cascade Release]`
+        : `Drop(r=${row}->${row - 1}, c=${col})`
     };
   }
 
   /**
    * Action a: Bottom row collector flush into basin.
+   * Flushes row 0 and cascades any connected stuck-open channels directly into basin.
    */
   executeCollectorFlush(col) {
     if (col !== 0 && col !== 1) {
@@ -105,6 +170,16 @@ class SandboxesEngine {
     this.cumulativeCost += cost;
     this.stepCount += 1;
 
+    // Check if contiguous open gates above row 0 cascade into basin
+    let currR = 1;
+    let cascadeOccurred = false;
+    while (currR < this.numRows && this.openGates.has(`${currR},${col}`)) {
+      cascadeOccurred = true;
+      this.grid[currR][col] = 0.0;
+      this.openGates.delete(`${currR},${col}`);
+      currR++;
+    }
+
     return {
       actionType: "COLLECTOR_FLUSH",
       action_type: "COLLECTOR_FLUSH",
@@ -114,8 +189,10 @@ class SandboxesEngine {
       delta_s: s,
       s_before: s,
       s_after: 0.0,
-      is_noop: s === 0,
-      description: s === 0 ? `Flush(r=0, c=${col}) [Empty: No-op]` : `Flush(r=0, c=${col})`
+      is_noop: s === 0 && !cascadeOccurred,
+      is_stuck_open: false,
+      cascade_occurred: cascadeOccurred,
+      description: cascadeOccurred ? `Flush(r=0, c=${col}) [Cascade Flush]` : `Flush(r=0, c=${col})`
     };
   }
 

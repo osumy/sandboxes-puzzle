@@ -67,13 +67,14 @@ A partition gate isolates Column 0 and Column 1 at each row $r$:
 - **Strict Inactivity Rule (No-op)**: For all other 7 configurations ($(1, 0.5), (0.5, 0), (0.5, 0.5), (1, 1), (0, 0), (0, 0.5), (0.5, 1)$), opening the gate produces zero transfer ($\Delta s = 0$) and leaves state unchanged.
   - *Mathematical Justification*: Equalizing between $1.0$ and $0.5$ (or $0.0$ and $0.5$) would produce continuous fractional values $0.75$ or $0.25$, violating the strict discrete 3-level state quantization $\Sigma = \{0.0, 0.5, 1.0\}$. Thus, such actions burn $1.0$ cost but are strict No-Ops.
 
-#### 4. The Non-Persistent Gate Principle & Vertical Stacking Invariant
-A natural physical question arises: *If both upper and lower cells are full ($s=1.0, s_{\text{low}}=1.0$), and the drawer gate between them is opened, does it stay open so that when the lower cell is later dumped, both cells evacuate together?*
-- **Algorithmic Answer**: **No, gates do not persist in an open state.**
-- **Proof by State-Space Cardinality**: In classical Russell & Norvig AI state-space formulation, the Markovian state representation is strictly $s \in \{0.0, 0.5, 1.0\}^{2n}$, yielding $|\Omega_5| = 59,049$ states. The state vector contains **no persistent gate-status variables** ($\text{GateOpen} \in \{0, 1\}$). If gates possessed persistent open/close states, the state space would expand by $2^{15} = 32,768$, exploding to $\approx 1.93 \times 10^9$ states.
-- **Physical Transition Dynamics**: Every gate operation is an **atomic, instantaneous pulse**. When opened, sand flows up to capacity ($\Delta s = \min(s, 1.0 - s_{\text{low}})$). Because the lower cell is full, available capacity is $\Delta_{\text{capacity}} = 0.0$. Thus, $\Delta s = 0.0$, a cost of $C = 1 + 4(1.0 + 1.0) = \mathbf{9.0}$ is incurred, and the gate **closes immediately**.
-- **Sequential Consequence**: When the lower cell is subsequently flushed in a later action, only the lower cell empties. The upper cell rests upon the already-closed intermediate gate and remains in place.
-- In all 7 search algorithms, this zero-transfer action is pruned as a suboptimal No-Op. In the interactive visualizer, it triggers a warning shake and explicit blocked notification.
+#### 4. The Spring-Latch Rule & Cascading Gravity Drops
+A specialized mechanical rule governs top-down gates when opened against a saturated lower cell:
+- **Physical Law (Stuck Spring Latch)**: If an upper cell contains sand ($s = 1.0$ or $0.5$) and the lower cell is completely full ($s_{\text{low}} = 1.0$), opening the vertical gate drawer cannot transfer sand immediately ($\Delta s = 0$). However, the mechanical spring latch gets stuck and **keeps the gate drawer OPEN** (`open_gates` state set). The action incurs cost $C = 1 + 4(s + s) = 1 + 8s$.
+- **Simultaneous Cascade Dynamics**: When the gate underneath the lower cell (or the bottom collector valve) is subsequently opened:
+  1. The entire contiguous vertical channel of open gates opens.
+  2. Sand from both the lower cell and the upper open cells discharges downward **simultaneously under gravity**, pooling bottom-to-top into the lowest available capacities.
+  3. Once the sand transfer completes, the spring latches release and the open gates snap closed.
+- **Implementation Synchronization**: Both the Python simulation environment (`SandboxesEnv` & `PuzzleState`) and the web visualizer (`SandboxesEngine` & `CanvasRenderer`) fully implement this physical rule, rendering stuck-open drawers with amber `OPEN ⇊` badges and animating simultaneous dual-cell cascades. In optimal search algorithms, this maneuver is recognized as strictly suboptimal and pruned, preserving fast DAG traversal.
 
 *(For the complete Persian specification, see [`PROBLEM_SPEC_FA.md`](PROBLEM_SPEC_FA.md)).*
 

@@ -68,6 +68,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Physics Rules Modal Toggle
+  const rulesHelpBtn = document.getElementById("rulesHelpBtn");
+  const rulesModalOverlay = document.getElementById("rulesModalOverlay");
+  const closeRulesBtn = document.getElementById("closeRulesBtn");
+
+  if (rulesHelpBtn && rulesModalOverlay) {
+    rulesHelpBtn.addEventListener("click", () => {
+      rulesModalOverlay.classList.add("active");
+    });
+  }
+
+  if (closeRulesBtn && rulesModalOverlay) {
+    closeRulesBtn.addEventListener("click", () => {
+      rulesModalOverlay.classList.remove("active");
+    });
+  }
+
+  if (rulesModalOverlay) {
+    rulesModalOverlay.addEventListener("click", (e) => {
+      if (e.target === rulesModalOverlay) {
+        rulesModalOverlay.classList.remove("active");
+      }
+    });
+  }
+
   // Setup Presets & Algorithms
   function populatePresets() {
     if (!window.SANDBOX_DATA) return;
@@ -331,38 +356,46 @@ document.addEventListener("DOMContentLoaded", () => {
     banner.style.display = "flex";
 
     if (hit.type === "TOP_DOWN") {
-      if (preInfo.isBlocked) {
+      if (actionRes.is_stuck_open) {
         banner.classList.add("warning");
-        iconEl.textContent = "⛔";
-        textEl.innerHTML = `<strong>مجرا مسدود است:</strong> خانه پایینی پر است (ظرفیت ۰)! هیچ شنی جابجا نشد. طبق قوانین معما، دریچه‌ها ماندگار نیستند و باز نمی‌مانند؛ بلکه بلافاصله بسته شدند (+${actionRes.cost.toFixed(1)} هزینه تلف شد).`;
+        iconEl.textContent = "🔓";
+        textEl.innerHTML = `<strong>Spring Latch Stuck OPEN:</strong> Lower cell (r=${hit.row - 1}) is full (1.0). Gate drawer remains stuck OPEN (+${actionRes.cost.toFixed(1)} cost). When the gate below opens, both cells cascade down simultaneously!`;
+      } else if (actionRes.cascade_occurred) {
+        banner.classList.add("success");
+        iconEl.textContent = "🌊";
+        textEl.innerHTML = `<strong>Simultaneous Gravity Cascade:</strong> Lower gate opened! Sand cascaded downward through open channels simultaneously. Stuck latches released (+${actionRes.cost.toFixed(1)} cost).`;
       } else if (preInfo.isEmpty) {
         banner.classList.add("info");
         iconEl.textContent = "⚠️";
-        textEl.innerHTML = `<strong>حرکت بی‌اثر:</strong> خانه بالایی خالی است و شنی برای ریختن وجود ندارد (+${actionRes.cost.toFixed(1)} هزینه).`;
+        textEl.innerHTML = `<strong>Empty Cell (No-Op):</strong> Upper cell (r=${hit.row}) is empty; no sand transferred (+${actionRes.cost.toFixed(1)} cost).`;
       } else {
         banner.classList.add("success");
         iconEl.textContent = "✅";
-        textEl.innerHTML = `<strong>انتقال عمودی:</strong> مقدار ${actionRes.delta_s.toFixed(1)} واحد شن از سطر ${hit.row} به سطر ${hit.row - 1} ریخته شد (+${actionRes.cost.toFixed(1)} هزینه). دریچه بسته شد.`;
+        textEl.innerHTML = `<strong>Vertical Drop:</strong> Transferred ${actionRes.delta_s.toFixed(1)} units of sand from row ${hit.row} to row ${hit.row - 1} (+${actionRes.cost.toFixed(1)} cost). Drawer closed.`;
       }
     } else if (hit.type === "SIDE_GATE") {
       if (actionRes.is_noop) {
         banner.classList.add("info");
         iconEl.textContent = "⚠️";
-        textEl.innerHTML = `<strong>دریچه جانبی بی‌اثر (No-Op):</strong> در سطر ${hit.row} مقادیر (${preInfo.c0.toFixed(1)} و ${preInfo.c1.toFixed(1)}) هستند. طبق قانون مسئله، برابرسازی فقط بین (1 و 0) انجام می‌شود و در حالت‌هایی مانند (0, 0.5) یا (1, 0.5) شنی منتقل نمی‌شود (+${actionRes.cost.toFixed(1)} هزینه).`;
+        textEl.innerHTML = `<strong>Side Gate Inactive (No-Op):</strong> Row ${hit.row} cells are (${preInfo.c0.toFixed(1)}, ${preInfo.c1.toFixed(1)}). Equalization strictly occurs only for (1.0, 0.0) or (0.0, 1.0). Asymmetric combinations like (0, 0.5) or (1, 0.5) produce zero transfer (+${actionRes.cost.toFixed(1)} cost).`;
       } else {
         banner.classList.add("success");
         iconEl.textContent = "✅";
-        textEl.innerHTML = `<strong>برابرسازی جانبی:</strong> دو خانه سطر ${hit.row} هر دو به ۰.۵ متوازن شدند (+${actionRes.cost.toFixed(1)} هزینه).`;
+        textEl.innerHTML = `<strong>Side Gate Equalization:</strong> Row ${hit.row} equalized to (0.5, 0.5) (+${actionRes.cost.toFixed(1)} cost).`;
       }
     } else if (hit.type === "COLLECTOR_FLUSH") {
-      if (preInfo.isEmpty) {
+      if (actionRes.cascade_occurred) {
+        banner.classList.add("success");
+        iconEl.textContent = "🌊";
+        textEl.innerHTML = `<strong>Cascade Collector Flush:</strong> Bottom cell and all connected open-channel rows dumped directly into the collector basin (+${actionRes.cost.toFixed(1)} cost).`;
+      } else if (preInfo.isEmpty) {
         banner.classList.add("info");
         iconEl.textContent = "⚠️";
-        textEl.innerHTML = `<strong>تخلیه مخزن بی‌اثر:</strong> خانه سطر ۰ خالی است (+${actionRes.cost.toFixed(1)} هزینه).`;
+        textEl.innerHTML = `<strong>Empty Cell Flush (No-Op):</strong> Bottom cell at col ${hit.col} is empty (+${actionRes.cost.toFixed(1)} cost).`;
       } else {
         banner.classList.add("success");
         iconEl.textContent = "✅";
-        textEl.innerHTML = `<strong>تخلیه در مخزن:</strong> مقدار ${actionRes.delta_s.toFixed(1)} واحد شن به حوضچه انتهایی تخلیه شد (+${actionRes.cost.toFixed(1)} هزینه).`;
+        textEl.innerHTML = `<strong>Collector Basin Flush:</strong> Dumped ${actionRes.delta_s.toFixed(1)} units of sand into the bottom basin (+${actionRes.cost.toFixed(1)} cost).`;
       }
     }
   }

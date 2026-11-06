@@ -1,6 +1,6 @@
 # Sandboxes Puzzle (معمای جعبه‌های شن)
 
-[![CI - Test Suite](https://img.shields.io/badge/pytest-39%20passed-brightgreen.svg)](tests/)
+[![CI - Test Suite](https://img.shields.io/badge/pytest-41%20passed-brightgreen.svg)](tests/)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](pyproject.toml)
 [![Documentation](https://img.shields.io/badge/docs-Persian%20%26%20English-blueviolet.svg)](PROBLEM_SPEC_FA.md)
 [![Zero Dependency Visualizer](https://img.shields.io/badge/visualizer-vanilla%20HTML5%2FCSS%2FJS-orange.svg)](visualizer/)
