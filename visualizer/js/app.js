@@ -189,6 +189,31 @@ document.addEventListener("DOMContentLoaded", () => {
         algoSelect.appendChild(opt);
       });
       currentAlgorithmKey = "astar";
+    } else if (currentPresetKey === "custom_generated") {
+      const preset = window.SANDBOX_DATA.presets["custom_generated"];
+      if (preset && preset.traces) {
+        const order = ["astar", "ucs", "greedy", "bfs", "dfs", "ids", "rbfs"];
+        const titles = {
+          astar: "A* Search (Optimal)",
+          ucs: "Uniform Cost Search (UCS)",
+          greedy: "Greedy Best-First",
+          bfs: "Breadth-First Search (BFS)",
+          dfs: "Depth-First Search (DFS)",
+          ids: "Iterative Deepening Search (IDS)",
+          rbfs: "Recursive Best-First Search (RBFS)"
+        };
+        order.forEach(key => {
+          const tr = preset.traces[key];
+          if (tr) {
+            const label = `${titles[key] || tr.algorithm} (Cost: ${tr.total_cost.toFixed(1)}, ${tr.path_length} steps, ${tr.execution_time_ms.toFixed(1)}ms)`;
+            const opt = document.createElement("option");
+            opt.value = key;
+            opt.textContent = label;
+            algoSelect.appendChild(opt);
+          }
+        });
+      }
+      currentAlgorithmKey = "astar";
     }
   }
 
@@ -208,7 +233,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const preset = window.SANDBOX_DATA.presets[currentPresetKey];
     if (!preset || !preset.traces) return;
 
-    const trace = preset.traces[currentAlgorithmKey];
+    let trace = preset.traces[currentAlgorithmKey];
+    if (!trace) {
+      const keys = Object.keys(preset.traces);
+      if (keys.length > 0) {
+        currentAlgorithmKey = keys[0];
+        algoSelect.value = currentAlgorithmKey;
+        trace = preset.traces[currentAlgorithmKey];
+      }
+    }
+
     if (trace) {
       player.loadTrace(trace);
       populateActionLog(trace.steps);
@@ -217,6 +251,9 @@ document.addEventListener("DOMContentLoaded", () => {
           optCostDisplay.textContent = "50.0";
         } else if (currentPresetKey === "side_gate_trap") {
           optCostDisplay.textContent = "52.0";
+        } else if (currentPresetKey === "custom_generated") {
+          const optTrace = preset.traces.astar || preset.traces.ucs || trace;
+          optCostDisplay.textContent = optTrace.total_cost.toFixed(1);
         } else {
           optCostDisplay.textContent = trace.total_cost.toFixed(1);
         }
@@ -477,8 +514,266 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // =========================================================================
+  // DYNAMIC PUZZLE GENERATOR MODAL & SOLVER CONTROLLER
+  // =========================================================================
+  function setupDynamicGenerator() {
+    const openGeneratorBtn = document.getElementById("openGeneratorBtn");
+    const generatorModalOverlay = document.getElementById("generatorModalOverlay");
+    const closeGeneratorBtn = document.getElementById("closeGeneratorBtn");
+    const cancelGenBtn = document.getElementById("cancelGenBtn");
+    const genRowsInput = document.getElementById("genRowsInput");
+    const chipBtns = document.querySelectorAll(".chip-btn");
+    const rollDiceBtn = document.getElementById("rollDiceBtn");
+    const solveAndLoadBtn = document.getElementById("solveAndLoadBtn");
+    const genStatusText = document.getElementById("genStatusText");
+    const engineOptions = document.querySelectorAll(".engine-option");
+
+    let currentGenRows = 5;
+    let currentPreviewGrid = null;
+
+    function generateNewPreviewState(rows) {
+      currentGenRows = Math.max(2, Math.min(7, Number(rows) || 5));
+      if (window.SandboxesSolver) {
+        currentPreviewGrid = window.SandboxesSolver.generateRandomState(currentGenRows);
+      } else {
+        currentPreviewGrid = SandboxesEngine.generateRandomState(currentGenRows);
+      }
+      renderGridPreview();
+    }
+
+    function renderGridPreview() {
+      if (!currentPreviewGrid) return;
+      const n = currentPreviewGrid.length;
+      const previewEl = document.getElementById("gridPreviewVisual");
+      const dimsEl = document.getElementById("previewDims");
+      const sandEl = document.getElementById("previewSand");
+      const statesEl = document.getElementById("previewStates");
+      const h3El = document.getElementById("previewH3");
+
+      if (dimsEl) dimsEl.innerHTML = `2 &times; ${n}`;
+
+      if (previewEl) {
+        previewEl.innerHTML = "";
+        // Render from row n-1 (top) down to row 0 (bottom)
+        for (let r = 0; r < n; r++) {
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "preview-row";
+
+          const labelSpan = document.createElement("span");
+          labelSpan.className = "preview-row-label";
+          labelSpan.textContent = `r${r}:`;
+          rowDiv.appendChild(labelSpan);
+
+          for (let c = 0; c < 2; c++) {
+            const val = currentPreviewGrid[r][c];
+            const cellDiv = document.createElement("div");
+            cellDiv.className = "preview-cell";
+            if (val === 0.0) {
+              cellDiv.classList.add("empty");
+              cellDiv.innerHTML = "<span>0.0</span>";
+            } else if (val === 0.5) {
+              cellDiv.classList.add("half");
+              cellDiv.innerHTML = "<span>0.5</span>";
+            } else {
+              cellDiv.classList.add("full");
+              cellDiv.innerHTML = "<span>1.0</span>";
+            }
+            rowDiv.appendChild(cellDiv);
+          }
+          previewEl.appendChild(rowDiv);
+        }
+      }
+
+      let totalSand = 0;
+      if (window.SandboxesSolver) {
+        totalSand = window.SandboxesSolver.getTotalSand(currentPreviewGrid);
+      } else {
+        currentPreviewGrid.forEach(r => totalSand += r[0] + r[1]);
+        totalSand = Math.round(totalSand * 10) / 10;
+      }
+      if (sandEl) sandEl.textContent = `${totalSand.toFixed(1)} u`;
+
+      const totalStates = Math.pow(3, 2 * n);
+      if (statesEl) statesEl.innerHTML = `3<sup>${2 * n}</sup> = ${totalStates.toLocaleString()}`;
+
+      let h3 = 0;
+      if (window.SandboxesSolver) {
+        h3 = window.SandboxesSolver.heuristicH3(currentPreviewGrid);
+      }
+      if (h3El) h3El.textContent = `${h3.toFixed(1)}`;
+    }
+
+    // Modal Visibility
+    if (openGeneratorBtn && generatorModalOverlay) {
+      openGeneratorBtn.addEventListener("click", () => {
+        generatorModalOverlay.classList.add("active");
+        if (!currentPreviewGrid) {
+          generateNewPreviewState(genRowsInput ? genRowsInput.value : 5);
+        }
+      });
+    }
+
+    const closeModal = () => {
+      if (generatorModalOverlay) generatorModalOverlay.classList.remove("active");
+    };
+
+    if (closeGeneratorBtn) closeGeneratorBtn.addEventListener("click", closeModal);
+    if (cancelGenBtn) cancelGenBtn.addEventListener("click", closeModal);
+
+    if (generatorModalOverlay) {
+      generatorModalOverlay.addEventListener("click", (e) => {
+        if (e.target === generatorModalOverlay) closeModal();
+      });
+    }
+
+    // Input & Chips
+    if (genRowsInput) {
+      genRowsInput.addEventListener("change", (e) => {
+        let val = parseInt(e.target.value, 10);
+        if (isNaN(val) || val < 2) val = 2;
+        if (val > 7) val = 7;
+        e.target.value = val;
+
+        chipBtns.forEach(btn => {
+          btn.classList.toggle("active", parseInt(btn.dataset.rows, 10) === val);
+        });
+        generateNewPreviewState(val);
+      });
+    }
+
+    chipBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        chipBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const rows = parseInt(btn.dataset.rows, 10);
+        if (genRowsInput) genRowsInput.value = rows;
+        generateNewPreviewState(rows);
+      });
+    });
+
+    if (rollDiceBtn) {
+      rollDiceBtn.addEventListener("click", () => {
+        const rows = genRowsInput ? parseInt(genRowsInput.value, 10) : 5;
+        generateNewPreviewState(rows);
+      });
+    }
+
+    // Engine Selection Options
+    engineOptions.forEach(opt => {
+      opt.addEventListener("click", () => {
+        engineOptions.forEach(o => o.classList.remove("active"));
+        opt.classList.add("active");
+        const radio = opt.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+      });
+    });
+
+    // Solve & Load
+    if (solveAndLoadBtn) {
+      solveAndLoadBtn.addEventListener("click", async () => {
+        if (!currentPreviewGrid) return;
+        const selectedRadio = document.querySelector('input[name="searchEngine"]:checked');
+        const selectedEngine = selectedRadio ? selectedRadio.value : "js";
+
+        solveAndLoadBtn.disabled = true;
+        solveAndLoadBtn.textContent = "⏳ Solving (7 Algorithms)...";
+        if (genStatusText) {
+          genStatusText.className = "gen-status-text loading";
+          genStatusText.textContent = selectedEngine === "python"
+            ? "Connecting to Python API at localhost:8000..."
+            : "Solving across all 7 search algorithms in browser...";
+        }
+
+        try {
+          let resultData = null;
+          let usedEngineLabel = "Browser JS Engine";
+
+          if (selectedEngine === "python") {
+            try {
+              const resp = await fetch("http://localhost:8000/api/solve", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ grid: currentPreviewGrid }),
+                signal: AbortSignal.timeout(3500)
+              });
+              if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+              resultData = await resp.json();
+              usedEngineLabel = "Python Backend (localhost:8000)";
+            } catch (fetchErr) {
+              console.warn("[Generator] Python API server unreachable, falling back to JS engine:", fetchErr);
+              resultData = SandboxesSolver.solveAll(currentPreviewGrid);
+              usedEngineLabel = "Browser JS Engine (Python Offline Fallback)";
+            }
+          } else {
+            await new Promise(resolve => setTimeout(resolve, 30));
+            resultData = SandboxesSolver.solveAll(currentPreviewGrid);
+          }
+
+          if (!window.SANDBOX_DATA) window.SANDBOX_DATA = { presets: {} };
+          if (!window.SANDBOX_DATA.presets) window.SANDBOX_DATA.presets = {};
+
+          window.SANDBOX_DATA.presets["custom_generated"] = {
+            initial_state: resultData.initial_state,
+            traces: resultData.traces,
+            num_rows: currentPreviewGrid.length
+          };
+
+          const customOption = document.getElementById("customPresetOption");
+          const optCost = resultData.traces.astar ? resultData.traces.astar.total_cost.toFixed(1) : "N/A";
+          const totalSand = SandboxesSolver.getTotalSand(currentPreviewGrid);
+
+          if (customOption) {
+            customOption.style.display = "";
+            customOption.textContent = `✨ Custom [2×${currentPreviewGrid.length}] (Mass: ${totalSand.toFixed(1)}u, Opt: ${optCost})`;
+          }
+
+          presetSelect.value = "custom_generated";
+          currentPresetKey = "custom_generated";
+
+          updateAlgorithmOptions();
+          loadActivePreset();
+
+          closeModal();
+
+          if (playBtn) {
+            playBtn.classList.add("btn-attention");
+            setTimeout(() => playBtn.classList.remove("btn-attention"), 6000);
+          }
+
+          const banner = document.getElementById("manualFeedbackBanner");
+          const iconEl = document.getElementById("feedbackIcon");
+          const textEl = document.getElementById("feedbackText");
+          if (banner && iconEl && textEl) {
+            banner.className = "feedback-banner success";
+            banner.style.display = "flex";
+            iconEl.textContent = "🚀";
+            textEl.innerHTML = `<strong>Custom Puzzle Loaded (${usedEngineLabel}):</strong> Solved with all 7 algorithms (Optimal Cost: ${optCost}). Choose any algorithm above and click <strong>▶ Play</strong> or Spacebar!`;
+          }
+        } catch (err) {
+          console.error("[Generator Error]", err);
+          if (genStatusText) {
+            genStatusText.className = "gen-status-text";
+            genStatusText.textContent = `Error: ${err.message}`;
+          }
+        } finally {
+          solveAndLoadBtn.disabled = false;
+          solveAndLoadBtn.textContent = "🚀 Solve & Load into Visualizer";
+          if (genStatusText) {
+            genStatusText.className = "gen-status-text";
+            genStatusText.textContent = "Ready to generate & solve.";
+          }
+        }
+      });
+    }
+
+    // Initial state generation
+    generateNewPreviewState(5);
+  }
+
   // Initialize
   populatePresets();
+  setupDynamicGenerator();
   dashboard.renderAll();
   setTimeout(renderMathFormulas, 200);
 });

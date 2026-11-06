@@ -46,7 +46,11 @@
             <option value="professor_case">Professor's 4-Row Benchmark (Palindromic)</option>
             <option value="sample_5row">Sample 5-Row Complex Puzzle</option>
             <option value="side_gate_trap">Showcase: Side-Gate Optimization & Greedy Trap (4-Row)</option>
+            <option value="custom_generated" id="customPresetOption" style="display: none;">✨ Custom Generated Puzzle</option>
           </select>
+          <button id="openGeneratorBtn" class="btn btn-generator" title="Generate New Dynamic 2xN Puzzle with Custom Probabilities">
+            <span class="btn-sparkle">✨</span> 🎲 New Example Generator
+          </button>
         </div>
 
         <div class="control-group">
@@ -585,6 +589,136 @@
     </div>
   </div>
 
+  <!-- VIEW MODAL: DYNAMIC PUZZLE GENERATOR -->
+  <div id="generatorModalOverlay" class="rules-modal-overlay">
+    <div class="rules-modal generator-modal">
+      
+      <div class="rules-modal-header">
+        <h2><span>🎲</span> Dynamic Puzzle Generator <span class="badge">AIMA Search</span></h2>
+        <button id="closeGeneratorBtn" class="rules-modal-close" title="Close Generator">&times;</button>
+      </div>
+
+      <div class="generator-modal-body" style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px;">
+        <p class="generator-desc">
+          Generate a customized vertical grid of <strong>2 columns &times; N rows</strong> initialized according to exact probability distributions, and instantly solve it across all 7 AI search algorithms.
+        </p>
+
+        <!-- Row N Input Controls -->
+        <div class="generator-section">
+          <label class="generator-label">
+            <span>Grid Rows (N):</span>
+            <span class="generator-subtext">Discrete vertical levels above the bottom collector basin (Row 0)</span>
+          </label>
+          <div class="row-input-group">
+            <input type="number" id="genRowsInput" min="2" max="7" value="5" class="gen-number-input">
+            <div class="quick-chip-group">
+              <button type="button" class="chip-btn" data-rows="3">3 Rows</button>
+              <button type="button" class="chip-btn" data-rows="4">4 Rows</button>
+              <button type="button" class="chip-btn active" data-rows="5">5 Rows (Standard)</button>
+              <button type="button" class="chip-btn" data-rows="6">6 Rows</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Probability Distribution Display -->
+        <div class="generator-section">
+          <label class="generator-label">
+            <span>Cell Fill Probabilities:</span>
+            <span class="generator-subtext">Calculated independently for each cell according to problem specification</span>
+          </label>
+          <div class="prob-grid">
+            <div class="prob-card empty">
+              <div class="prob-badge">50% (1/2)</div>
+              <div class="prob-title">Empty Cell (0.0)</div>
+              <div class="prob-desc">Chamber contains no sand</div>
+            </div>
+            <div class="prob-card full">
+              <div class="prob-badge">30% (3/10)</div>
+              <div class="prob-title">Full Sand (1.0)</div>
+              <div class="prob-desc">Chamber filled to capacity</div>
+            </div>
+            <div class="prob-card half">
+              <div class="prob-badge">20% (2/10)</div>
+              <div class="prob-title">Half Sand (0.5)</div>
+              <div class="prob-desc">Chamber half filled</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Live Grid Preview -->
+        <div class="generator-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label class="generator-label" style="margin: 0;">
+              <span>Live Grid Preview:</span>
+            </label>
+            <button id="rollDiceBtn" class="btn" style="font-size: 0.78rem; padding: 4px 10px;" title="Re-roll sand distribution with current probabilities">
+              🎲 Re-roll Sand Configuration
+            </button>
+          </div>
+          
+          <div class="preview-container">
+            <div id="gridPreviewVisual" class="grid-preview-visual">
+              <!-- Dynamically populated mini grid -->
+            </div>
+            <div class="preview-stats">
+              <div class="stat-item">
+                <span class="stat-name">Grid Dimensions:</span>
+                <span id="previewDims" class="stat-val">2 &times; 5</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-name">Total Sand Mass:</span>
+                <span id="previewSand" class="stat-val">0.0 u</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-name">State Space Size:</span>
+                <span id="previewStates" class="stat-val">3<sup>10</sup> = 59,049</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-name">Heuristic h<sub>3</sub> Lower Bound:</span>
+                <span id="previewH3" class="stat-val">0.0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Execution Engine Selection -->
+        <div class="generator-section">
+          <label class="generator-label">
+            <span>Search Execution Engine:</span>
+          </label>
+          <div class="engine-toggle-group">
+            <label class="engine-option active">
+              <input type="radio" name="searchEngine" value="js" checked>
+              <div class="engine-info">
+                <div class="engine-title">⚡ High-Performance Browser Engine (JavaScript)</div>
+                <div class="engine-sub">Instant zero-latency execution in browser (~5-40ms). Zero server or setup required.</div>
+              </div>
+            </label>
+            <label class="engine-option">
+              <input type="radio" name="searchEngine" value="python">
+              <div class="engine-info">
+                <div class="engine-title">🐍 Python Backend API (http://localhost:8000)</div>
+                <div class="engine-sub">Runs server.py with Python search classes. Auto-falls back to JS if server is offline.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="generator-modal-footer">
+          <div id="genStatusText" class="gen-status-text">Ready to generate & solve.</div>
+          <div style="display: flex; gap: 10px;">
+            <button id="cancelGenBtn" class="btn">Cancel</button>
+            <button id="solveAndLoadBtn" class="btn btn-primary btn-generate-solve">
+              🚀 Solve & Load into Visualizer
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="app-footer">
     Sandboxes Puzzle AI Search System &bull; Standalone HTML5/CSS3/ES6 Engine &bull; Zero External Dependencies
@@ -593,6 +727,7 @@
   <!-- Scripts -->
   <script src="js/data.js"></script>
   <script src="js/engine.js"></script>
+  <script src="js/search.js"></script>
   <script src="js/renderer.js"></script>
   <script src="js/player.js"></script>
   <script src="js/dashboard.js"></script>
