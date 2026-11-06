@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sandboxes Puzzle (معمای جعبه‌های شن) - AI Search & Visualizer</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">⏳</div>
+      <div>
+        <h1>Sandboxes Puzzle <span class="badge">AIMA AI Search Engine</span></h1>
+      </div>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="visualizerView">🎬 Trace Player</button>
+      <button class="tab-btn" data-tab="dashboardView">📊 Benchmark Dashboard</button>
+      <button class="tab-btn" data-tab="theoryView">📐 Formulation & Proofs</button>
+    </nav>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-container">
+
+    <!-- VIEW 1: TRACE PLAYER & MANUAL MODE -->
+    <section id="visualizerView" class="view-section active">
+      
+      <!-- Control Bar -->
+      <div class="control-bar">
+        <div class="control-group">
+          <label class="control-label" for="presetSelect">Preset Configuration:</label>
+          <select id="presetSelect">
+            <option value="professor_case">Professor's 4-Row Benchmark (Palindromic)</option>
+            <option value="sample_5row">Sample 5-Row Complex Puzzle</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="algoSelect">Solution Trace:</label>
+          <select id="algoSelect">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <div class="control-group">
+          <button id="stepPrevBtn" class="btn" title="Step Back (Left Arrow)">◀ Step</button>
+          <button id="playBtn" class="btn btn-primary" title="Play / Pause (Space)">▶ Play</button>
+          <button id="stepNextBtn" class="btn" title="Step Forward (Right Arrow)">Step ▶</button>
+          <button id="resetBtn" class="btn" title="Reset (R)">↺ Reset</button>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="speedSlider">Speed:</label>
+          <input type="range" id="speedSlider" class="scrub-slider" min="0.25" max="5.0" step="0.25" value="1.0" style="width: 90px;">
+          <span id="speedLabel" class="step-label">1.0x</span>
+        </div>
+      </div>
+
+      <!-- Workspace: Canvas & HUD -->
+      <div class="visualizer-workspace">
+        
+        <!-- Left: Canvas Sandbox -->
+        <div class="canvas-card">
+          <canvas id="sandCanvas"></canvas>
+          <p style="margin-top: 10px; font-size: 0.78rem; color: var(--text-dim);">
+            💡 Tip: In manual mode, click any top-down drawer or side gate divider to trigger discrete physical sand transfer.
+          </p>
+        </div>
+
+        <!-- Right: Heads-Up Display -->
+        <div class="hud-panel">
+          
+          <div class="metric-card">
+            <h3>Cumulative Path Cost</h3>
+            <div class="metric-value">
+              <span id="costDisplay">0.0</span>
+              <span class="metric-sub">/ opt: <span id="optCostDisplay">45.0</span></span>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="metric-card">
+              <h3>Action Steps</h3>
+              <div class="metric-value" id="stepDisplay">0</div>
+            </div>
+            <div class="metric-card">
+              <h3>Sand Mass</h3>
+              <div class="metric-value" id="sandDisplay">4.0 u</div>
+            </div>
+          </div>
+
+          <!-- Timeline Scrubber -->
+          <div class="timeline-card">
+            <div class="timeline-controls">
+              <span class="control-label">Timeline Scrub:</span>
+              <span id="timelineLabel" class="step-label">0 / 0</span>
+            </div>
+            <input type="range" id="timelineSlider" class="scrub-slider" min="0" max="0" value="0">
+          </div>
+
+          <!-- Action Log -->
+          <div class="metric-card" style="flex: 1; display: flex; flex-direction: column;">
+            <h3>Execution Trace Log</h3>
+            <div id="actionLog" class="action-log">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- VIEW 2: BENCHMARK DASHBOARD -->
+    <section id="dashboardView" class="view-section">
+      
+      <!-- Top Row: Scatter Plots -->
+      <div class="dashboard-grid">
+        
+        <!-- Plot 1: Greedy vs Optimum -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Plot 1: Cost by Greedy Solution vs. Optimum Cost</h3>
+            <span class="badge">59,049 States</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">
+            Evaluates the suboptimality of Greedy Best-First. Points along the dashed line y = x represent optimal solutions.
+          </p>
+          <canvas id="plot1Canvas" class="chart-canvas"></canvas>
+        </div>
+
+        <!-- Plot 2: Total Actions vs Type-b -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Plot 2: Total Actions to Goal vs. Type-b (Side-Gates)</h3>
+            <span class="badge">59,049 States</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">
+            Examines the correlation between horizontal equalizations (Action b) and total sequence length to clear the grid.
+          </p>
+          <canvas id="plot2Canvas" class="chart-canvas"></canvas>
+        </div>
+
+      </div>
+
+      <!-- Middle Row: Histogram -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Plot 3: Frequency Distribution Histogram (Greedy_opt_ratio)</h3>
+          <span class="badge">Greedy Suboptimality Factor</span>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+          Distribution of ratio = (Cost by Greedy) / (Optimum Cost) across the entire 59,049 state space.
+        </p>
+        <canvas id="histCanvas" class="chart-canvas"></canvas>
+      </div>
+
+      <!-- Bottom Row: Comparative Algorithm Table -->
+      <div class="table-card">
+        <div class="chart-header" style="margin-bottom: 12px;">
+          <h3>7-Algorithm Empirical Benchmark Summary</h3>
+          <span class="badge">Russell & Norvig AIMA Comparison</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Mean Cost</th>
+              <th>Mean Steps</th>
+              <th>Nodes Expanded</th>
+              <th>Nodes Generated</th>
+              <th>Execution Time</th>
+              <th>Peak Memory</th>
+              <th>Optimality</th>
+            </tr>
+          </thead>
+          <tbody id="benchmarkTableBody">
+            <!-- Dynamically populated from data.js -->
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- VIEW 3: THEORETICAL FORMULATION & PROOFS -->
+    <section id="theoryView" class="view-section">
+      <div class="chart-card" style="line-height: 1.6; font-size: 0.9rem;">
+        <h2 style="margin-bottom: 12px; color: var(--accent);">Formal Mathematical Formulation & Parity Theorems</h2>
+        
+        <h3 style="margin-top: 16px; margin-bottom: 6px; color: var(--sand-light);">1. State Space & Combinatorics</h3>
+        <p>
+          The puzzle consists of an \(n \times 2\) vertical grid where each cell holds sand level \(s \in \{0.0, 0.5, 1.0\}\).
+          The exact state space cardinality is \(|\Omega| = 3^{2n}\). For \(n=5\), \(|\Omega_5| = 3^{10} = \mathbf{59,049}\) states.
+          All valid non-noop state transitions form a <strong>Directed Acyclic Graph (DAG)</strong> because sand falls strictly downward,
+          equalizes irreversibly via side gates \((1.0, 0.0) \to (0.5, 0.5)\), or flushes permanently into the collector basin.
+        </p>
+
+        <h3 style="margin-top: 16px; margin-bottom: 6px; color: var(--sand-light);">2. Action Physics & Discrete Cost Model</h3>
+        <ul>
+          <li><strong>Top-Down Gate (Action a)</strong>: Row \(r \to r-1\) in col \(c\). \(\Delta s = \min(s, 1.0 - s_{\text{low}})\). Cost: \(C_a = 1 + 4(s + s')\).</li>
+          <li><strong>Collector Flush</strong>: Empties row 0 in col \(c\). \(\Delta s = s_{0, c}, s' = 0\). Cost: \(C_{\text{flush}} = 1 + 4 s_{0, c}\) (\(1.0 \to 5.0, 0.5 \to 3.0\)).</li>
+          <li><strong>Side Gate (Action b)</strong>: Equalizes horizontal cells \((1, 0) \to (0.5, 0.5)\) at constant cost \(C_b = \mathbf{1.0}\). All other configurations are no-ops.</li>
+        </ul>
+
+        <h3 style="margin-top: 16px; margin-bottom: 6px; color: var(--sand-light);">3. The Cost Parity Theorem & Professor's 4-Row Benchmark</h3>
+        <p>
+          Every non-noop discrete action incurs an odd integer cost \(c_i \in \{1, 3, 5, 7\}\). Consequently, for any sequence of \(K\) actions,
+          total path cost satisfies \(C = \sum_{i=1}^K c_i \equiv K \pmod 2\).
+        </p>
+        <p>
+          In the professor's palindromic initial state \([[1,0], [0,1], [0,1], [1,0]]\):
+        </p>
+        <ul>
+          <li><strong>Baseline (without side gates)</strong>: 10 actions of cost 5.0 = <strong>50.0</strong>.</li>
+          <li><strong>Side-Gate Solution (Cost 45)</strong>: 11 actions (1 side gate at cost 1, 3 half-transfers at cost 3, 7 full-transfers at cost 5): \(1(1) + 3(3) + 7(5) = \mathbf{45}\).</li>
+          <li><strong>Alternative Solution (Cost 46)</strong>: 12 actions (2 side gates, 3 half-transfers, 7 full-transfers): \(2(1) + 3(3) + 7(5) = \mathbf{46}\).</li>
+          <li><strong>Greedy Solution (Cost 47)</strong>: 13 actions trapped by local heuristic evaluation into opening 3 side gates: \(3(1) + 3(3) + 7(5) = \mathbf{47}\).</li>
+        </ul>
+
+        <h3 style="margin-top: 16px; margin-bottom: 6px; color: var(--sand-light);">4. Admissible & Consistent Heuristics</h3>
+        <p>
+          Heuristic \(h_3(s) = 5.0 \sum_{r=0}^{n-1} \sum_{c \in \{0, 1\}} (r + 1) s_{r, c}\) is strictly admissible (\(h_3(s) \le h^*(s)\))
+          and monotone/consistent across all 59,049 states, achieving significant search space reduction in A* while guaranteeing optimality.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    Sandboxes Puzzle AI Search System &bull; Standalone HTML5/CSS3/ES6 Engine &bull; Zero External Dependencies
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

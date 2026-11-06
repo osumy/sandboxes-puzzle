@@ -18,9 +18,10 @@ class RecursiveBestFirstSearch(SearchAlgorithm):
     Recursive Best-First Search (RBFS).
     """
 
-    def __init__(self, heuristic: Optional[HeuristicFunction] = None):
+    def __init__(self, heuristic: Optional[HeuristicFunction] = None, max_expansions: int = 25000):
         super().__init__("RBFS")
         self.heuristic = heuristic if heuristic is not None else CombinedHeuristic()
+        self.max_expansions = max_expansions
         self._nodes_expanded = 0
         self._nodes_generated = 0
         self._max_frontier = 0
@@ -49,7 +50,7 @@ class RecursiveBestFirstSearch(SearchAlgorithm):
 
         goal_node, _ = self._rbfs(root, f_limit=math.inf)
 
-        if goal_node is not None:
+        if goal_node is not None and goal_node.state.is_goal:
             return SearchResult(
                 algorithm_name=self.name,
                 solution_path=goal_node.get_path(),
@@ -83,6 +84,9 @@ class RecursiveBestFirstSearch(SearchAlgorithm):
         """
         if node.state.is_goal:
             return node, node.f
+
+        if self._nodes_expanded >= self.max_expansions:
+            return None, math.inf
 
         successors = SandboxesEnv.get_successors(node.state, prune_noops=True)
         if not successors:
@@ -127,6 +131,9 @@ class RecursiveBestFirstSearch(SearchAlgorithm):
 
         # Loop until best child exceeds f_limit or goal is found
         while True:
+            if self._nodes_expanded >= self.max_expansions:
+                return None, math.inf
+
             # Sort children by f-value
             children.sort(key=lambda c: c.f)
             best = children[0]

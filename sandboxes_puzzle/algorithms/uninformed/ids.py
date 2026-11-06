@@ -1,10 +1,10 @@
 """
 Iterative Deepening Search (IDS) implementation following Russell & Norvig AIMA.
-Repeatedly applies depth-limited DFS with increasing depth limits.
+Repeatedly applies depth-limited search with increasing depth limits.
 Guarantees finding the shallowest goal in unweighted step counts while maintaining linear memory.
 """
 
-from typing import Optional, Tuple, Set
+from typing import Optional, Tuple, Dict
 
 from sandboxes_puzzle.algorithms.base import SearchAlgorithm, SearchResult, Node
 from sandboxes_puzzle.environment.state import PuzzleState
@@ -83,16 +83,16 @@ class IterativeDeepeningSearch(SearchAlgorithm):
         self, root: Node, limit: int
     ) -> Tuple[Optional[Node], int, int, int, bool]:
         """
-        Depth-Limited Search subroutine.
+        Depth-Limited Search subroutine with depth-pruned graph search.
         Returns: (goal_node_or_none, expanded, generated, max_frontier, cutoff_occurred)
         """
         frontier = [root]
+        best_depth: Dict[PuzzleState, int] = {root.state: 0}
         expanded = 0
         generated = 0
         max_frontier = 1
         cutoff = False
 
-        # Track path ancestor states for cycle checking
         while frontier:
             if len(frontier) > max_frontier:
                 max_frontier = len(frontier)
@@ -109,22 +109,15 @@ class IterativeDeepeningSearch(SearchAlgorithm):
             expanded += 1
 
             for next_state, action, cost in SandboxesEnv.get_successors(node.state, prune_noops=True):
-                # Cycle check: verify not in ancestor chain
-                is_cycle = False
-                curr: Optional[Node] = node
-                while curr is not None:
-                    if curr.state == next_state:
-                        is_cycle = True
-                        break
-                    curr = curr.parent
-
-                if not is_cycle:
+                nxt_depth = node.depth + 1
+                if next_state not in best_depth or nxt_depth < best_depth[next_state]:
+                    best_depth[next_state] = nxt_depth
                     child = Node(
                         state=next_state,
                         parent=node,
                         action=action,
                         path_cost=node.path_cost + cost,
-                        depth=node.depth + 1,
+                        depth=nxt_depth,
                     )
                     generated += 1
                     frontier.append(child)
