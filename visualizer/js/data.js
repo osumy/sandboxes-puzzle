@@ -6,13 +6,13 @@ window.SANDBOX_DATA = {
     "total_state_space_cardinality": 59049,
     "rows": 5,
     "cols": 2,
-    "evaluation_time_sec": 0.756
+    "evaluation_time_sec": 0.635
   },
   "benchmark_summary": [
     {
       "algorithm": "BFS",
-      "mean_time_ms": 491.88,
-      "mean_peak_memory_mb": 2.2768,
+      "mean_time_ms": 422.77,
+      "mean_peak_memory_mb": 2.2867,
       "mean_nodes_expanded": 3705.7,
       "mean_nodes_generated": 3746.1,
       "mean_cost": 55.0,
@@ -22,7 +22,7 @@ window.SANDBOX_DATA = {
     },
     {
       "algorithm": "DFS",
-      "mean_time_ms": 2.49,
+      "mean_time_ms": 2.15,
       "mean_peak_memory_mb": 0.0426,
       "mean_nodes_expanded": 23.2,
       "mean_nodes_generated": 91.3,
@@ -33,8 +33,8 @@ window.SANDBOX_DATA = {
     },
     {
       "algorithm": "UCS",
-      "mean_time_ms": 563.66,
-      "mean_peak_memory_mb": 2.4773,
+      "mean_time_ms": 491.53,
+      "mean_peak_memory_mb": 2.4805,
       "mean_nodes_expanded": 3764.6,
       "mean_nodes_generated": 4298.1,
       "mean_cost": 54.8,
@@ -44,8 +44,8 @@ window.SANDBOX_DATA = {
     },
     {
       "algorithm": "IDS",
-      "mean_time_ms": 5790.47,
-      "mean_peak_memory_mb": 1.9381,
+      "mean_time_ms": 4675.58,
+      "mean_peak_memory_mb": 1.9408,
       "mean_nodes_expanded": 39709.8,
       "mean_nodes_generated": 51436.9,
       "mean_cost": 55.0,
@@ -55,7 +55,7 @@ window.SANDBOX_DATA = {
     },
     {
       "algorithm": "Greedy",
-      "mean_time_ms": 1.3,
+      "mean_time_ms": 1.11,
       "mean_peak_memory_mb": 0.0203,
       "mean_nodes_expanded": 13.5,
       "mean_nodes_generated": 43.3,
@@ -66,7 +66,7 @@ window.SANDBOX_DATA = {
     },
     {
       "algorithm": "A*",
-      "mean_time_ms": 100.89,
+      "mean_time_ms": 87.49,
       "mean_peak_memory_mb": 0.9992,
       "mean_nodes_expanded": 670.9,
       "mean_nodes_generated": 1307.3,
@@ -77,7 +77,7 @@ window.SANDBOX_DATA = {
     },
     {
       "algorithm": "RBFS",
-      "mean_time_ms": 1047.59,
+      "mean_time_ms": 875.3,
       "mean_peak_memory_mb": 0.0252,
       "mean_nodes_expanded": 9679.1,
       "mean_nodes_generated": 29083.5,
@@ -21269,7 +21269,7 @@ window.SANDBOX_DATA = {
         "greedy_47": {
           "algorithm": "Greedy (Cost 47)",
           "total_cost": 47.0,
-          "path_length": 13,
+          "path_length": 15,
           "nodes_expanded": 15,
           "nodes_generated": 42,
           "execution_time_ms": 1.25,
@@ -21689,6 +21689,66 @@ window.SANDBOX_DATA = {
                   0.0
                 ]
               ]
+            },
+            {
+              "step": 14,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 44.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 15,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 3.0,
+              "cum_cost": 47.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
             }
           ]
         },
@@ -21698,7 +21758,7 @@ window.SANDBOX_DATA = {
           "path_length": 10,
           "nodes_expanded": 2068,
           "nodes_generated": 2377,
-          "execution_time_ms": 230.775,
+          "execution_time_ms": 193.329,
           "steps": [
             {
               "step": 0,
@@ -22034,7 +22094,7 @@ window.SANDBOX_DATA = {
           "path_length": 10,
           "nodes_expanded": 55,
           "nodes_generated": 126,
-          "execution_time_ms": 5.228,
+          "execution_time_ms": 4.662,
           "steps": [
             {
               "step": 0,
@@ -22396,7 +22456,7 @@ window.SANDBOX_DATA = {
           "path_length": 9,
           "nodes_expanded": 848,
           "nodes_generated": 1061,
-          "execution_time_ms": 100.773,
+          "execution_time_ms": 79.915,
           "steps": [
             {
               "step": 0,
@@ -22742,7 +22802,7 @@ window.SANDBOX_DATA = {
           "path_length": 22,
           "nodes_expanded": 22,
           "nodes_generated": 82,
-          "execution_time_ms": 2.078,
+          "execution_time_ms": 2.401,
           "steps": [
             {
               "step": 0,
@@ -23530,7 +23590,7 @@ window.SANDBOX_DATA = {
           "path_length": 9,
           "nodes_expanded": 1197,
           "nodes_generated": 1381,
-          "execution_time_ms": 142.611,
+          "execution_time_ms": 116.957,
           "steps": [
             {
               "step": 0,
@@ -23876,7 +23936,7 @@ window.SANDBOX_DATA = {
           "path_length": 9,
           "nodes_expanded": 4188,
           "nodes_generated": 6560,
-          "execution_time_ms": 460.192,
+          "execution_time_ms": 377.832,
           "steps": [
             {
               "step": 0,
@@ -24222,7 +24282,7 @@ window.SANDBOX_DATA = {
           "path_length": 9,
           "nodes_expanded": 9,
           "nodes_generated": 32,
-          "execution_time_ms": 0.861,
+          "execution_time_ms": 0.842,
           "steps": [
             {
               "step": 0,
@@ -24568,7 +24628,7 @@ window.SANDBOX_DATA = {
           "path_length": 9,
           "nodes_expanded": 34,
           "nodes_generated": 81,
-          "execution_time_ms": 3.246,
+          "execution_time_ms": 3.013,
           "steps": [
             {
               "step": 0,
@@ -24914,7 +24974,7 @@ window.SANDBOX_DATA = {
           "path_length": 9,
           "nodes_expanded": 9,
           "nodes_generated": 32,
-          "execution_time_ms": 0.927,
+          "execution_time_ms": 0.87,
           "steps": [
             {
               "step": 0,
@@ -25234,6 +25294,3190 @@ window.SANDBOX_DATA = {
                   0.0,
                   0.0
                 ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "side_gate_trap": {
+      "initial_state": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          0.5,
+          0.5
+        ]
+      ],
+      "traces": {
+        "bfs": {
+          "algorithm": "BFS",
+          "total_cost": 52.0,
+          "path_length": 12,
+          "nodes_expanded": 1718,
+          "nodes_generated": 1739,
+          "execution_time_ms": 133.497,
+          "steps": [
+            {
+              "step": 0,
+              "action_type": "INITIAL",
+              "description": "Initial puzzle configuration",
+              "cost": 0.0,
+              "cum_cost": 0.0,
+              "target": null,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 1,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 5.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 10.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 15.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 4,
+              "action_type": "SIDE_GATE",
+              "description": "SideGate(r=2)",
+              "cost": 1.0,
+              "cum_cost": 16.0,
+              "target": {
+                "row": 2,
+                "col": null
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 5,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=0)",
+              "cost": 3.0,
+              "cum_cost": 19.0,
+              "target": {
+                "row": 3,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 6,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=0)",
+              "cost": 5.0,
+              "cum_cost": 24.0,
+              "target": {
+                "row": 2,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 7,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 29.0,
+              "target": {
+                "row": 1,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 8,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 34.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 9,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=1)",
+              "cost": 3.0,
+              "cum_cost": 37.0,
+              "target": {
+                "row": 3,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 10,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=1)",
+              "cost": 5.0,
+              "cum_cost": 42.0,
+              "target": {
+                "row": 2,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 11,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 47.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 12,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 52.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            }
+          ]
+        },
+        "dfs": {
+          "algorithm": "DFS",
+          "total_cost": 87.0,
+          "path_length": 23,
+          "nodes_expanded": 23,
+          "nodes_generated": 93,
+          "execution_time_ms": 2.094,
+          "steps": [
+            {
+              "step": 0,
+              "action_type": "INITIAL",
+              "description": "Initial puzzle configuration",
+              "cost": 0.0,
+              "cum_cost": 0.0,
+              "target": null,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 1,
+              "action_type": "SIDE_GATE",
+              "description": "SideGate(r=2)",
+              "cost": 1.0,
+              "cum_cost": 1.0,
+              "target": {
+                "row": 2,
+                "col": null
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "action_type": "SIDE_GATE",
+              "description": "SideGate(r=1)",
+              "cost": 1.0,
+              "cum_cost": 2.0,
+              "target": {
+                "row": 1,
+                "col": null
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "action_type": "SIDE_GATE",
+              "description": "SideGate(r=0)",
+              "cost": 1.0,
+              "cum_cost": 3.0,
+              "target": {
+                "row": 0,
+                "col": null
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 4,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=1)",
+              "cost": 3.0,
+              "cum_cost": 6.0,
+              "target": {
+                "row": 3,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  1.0
+                ],
+                [
+                  0.5,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 5,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=0)",
+              "cost": 3.0,
+              "cum_cost": 9.0,
+              "target": {
+                "row": 3,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 6,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=1)",
+              "cost": 7.0,
+              "cum_cost": 16.0,
+              "target": {
+                "row": 2,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 7,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=0)",
+              "cost": 7.0,
+              "cum_cost": 23.0,
+              "target": {
+                "row": 2,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 8,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 7.0,
+              "cum_cost": 30.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 9,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=1)",
+              "cost": 3.0,
+              "cum_cost": 33.0,
+              "target": {
+                "row": 2,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.5,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 10,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=0)",
+              "cost": 7.0,
+              "cum_cost": 40.0,
+              "target": {
+                "row": 1,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.5,
+                  1.0
+                ],
+                [
+                  0.5,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 11,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=0)",
+              "cost": 3.0,
+              "cum_cost": 43.0,
+              "target": {
+                "row": 2,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 12,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 48.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 13,
+              "action_type": "SIDE_GATE",
+              "description": "SideGate(r=0)",
+              "cost": 1.0,
+              "cum_cost": 49.0,
+              "target": {
+                "row": 0,
+                "col": null
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 14,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 7.0,
+              "cum_cost": 56.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 15,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=0)",
+              "cost": 7.0,
+              "cum_cost": 63.0,
+              "target": {
+                "row": 1,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 16,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 68.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 17,
+              "action_type": "SIDE_GATE",
+              "description": "SideGate(r=0)",
+              "cost": 1.0,
+              "cum_cost": 69.0,
+              "target": {
+                "row": 0,
+                "col": null
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 18,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 3.0,
+              "cum_cost": 72.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  1.0
+                ],
+                [
+                  0.5,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 19,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=0)",
+              "cost": 3.0,
+              "cum_cost": 75.0,
+              "target": {
+                "row": 1,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 20,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 80.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 21,
+              "action_type": "SIDE_GATE",
+              "description": "SideGate(r=0)",
+              "cost": 1.0,
+              "cum_cost": 81.0,
+              "target": {
+                "row": 0,
+                "col": null
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 22,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 3.0,
+              "cum_cost": 84.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 23,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 3.0,
+              "cum_cost": 87.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            }
+          ]
+        },
+        "ucs": {
+          "algorithm": "UCS",
+          "total_cost": 52.0,
+          "path_length": 12,
+          "nodes_expanded": 1742,
+          "nodes_generated": 1999,
+          "execution_time_ms": 193.783,
+          "steps": [
+            {
+              "step": 0,
+              "action_type": "INITIAL",
+              "description": "Initial puzzle configuration",
+              "cost": 0.0,
+              "cum_cost": 0.0,
+              "target": null,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 1,
+              "action_type": "SIDE_GATE",
+              "description": "SideGate(r=2)",
+              "cost": 1.0,
+              "cum_cost": 1.0,
+              "target": {
+                "row": 2,
+                "col": null
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=0)",
+              "cost": 3.0,
+              "cum_cost": 4.0,
+              "target": {
+                "row": 3,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=1)",
+              "cost": 3.0,
+              "cum_cost": 7.0,
+              "target": {
+                "row": 3,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 4,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 12.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 5,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 17.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 6,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 22.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 7,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=0)",
+              "cost": 5.0,
+              "cum_cost": 27.0,
+              "target": {
+                "row": 2,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 8,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 32.0,
+              "target": {
+                "row": 1,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 9,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 37.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 10,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=1)",
+              "cost": 5.0,
+              "cum_cost": 42.0,
+              "target": {
+                "row": 2,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 11,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 47.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 12,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 52.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            }
+          ]
+        },
+        "ids": {
+          "algorithm": "IDS",
+          "total_cost": 52.0,
+          "path_length": 12,
+          "nodes_expanded": 16598,
+          "nodes_generated": 21874,
+          "execution_time_ms": 1348.133,
+          "steps": [
+            {
+              "step": 0,
+              "action_type": "INITIAL",
+              "description": "Initial puzzle configuration",
+              "cost": 0.0,
+              "cum_cost": 0.0,
+              "target": null,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 1,
+              "action_type": "SIDE_GATE",
+              "description": "SideGate(r=2)",
+              "cost": 1.0,
+              "cum_cost": 1.0,
+              "target": {
+                "row": 2,
+                "col": null
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=1)",
+              "cost": 3.0,
+              "cum_cost": 4.0,
+              "target": {
+                "row": 3,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.5,
+                  1.0
+                ],
+                [
+                  0.5,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=0)",
+              "cost": 3.0,
+              "cum_cost": 7.0,
+              "target": {
+                "row": 3,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 4,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=0)",
+              "cost": 5.0,
+              "cum_cost": 12.0,
+              "target": {
+                "row": 2,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 5,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 17.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 6,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=1)",
+              "cost": 5.0,
+              "cum_cost": 22.0,
+              "target": {
+                "row": 2,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 7,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 27.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 8,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 32.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 9,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 37.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 10,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 42.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 11,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 47.0,
+              "target": {
+                "row": 1,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 12,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 52.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            }
+          ]
+        },
+        "greedy": {
+          "algorithm": "Greedy",
+          "total_cost": 54.0,
+          "path_length": 14,
+          "nodes_expanded": 14,
+          "nodes_generated": 41,
+          "execution_time_ms": 0.966,
+          "steps": [
+            {
+              "step": 0,
+              "action_type": "INITIAL",
+              "description": "Initial puzzle configuration",
+              "cost": 0.0,
+              "cum_cost": 0.0,
+              "target": null,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 1,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 5.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 10.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 15.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 4,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=0)",
+              "cost": 5.0,
+              "cum_cost": 20.0,
+              "target": {
+                "row": 2,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 5,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 25.0,
+              "target": {
+                "row": 1,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 6,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 30.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 7,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=0)",
+              "cost": 3.0,
+              "cum_cost": 33.0,
+              "target": {
+                "row": 3,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 8,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=0)",
+              "cost": 3.0,
+              "cum_cost": 36.0,
+              "target": {
+                "row": 2,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 9,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=0)",
+              "cost": 3.0,
+              "cum_cost": 39.0,
+              "target": {
+                "row": 1,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.5,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 10,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 3.0,
+              "cum_cost": 42.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 11,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=1)",
+              "cost": 3.0,
+              "cum_cost": 45.0,
+              "target": {
+                "row": 3,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 12,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=1)",
+              "cost": 3.0,
+              "cum_cost": 48.0,
+              "target": {
+                "row": 2,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 13,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 3.0,
+              "cum_cost": 51.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 14,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 3.0,
+              "cum_cost": 54.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            }
+          ]
+        },
+        "astar": {
+          "algorithm": "A*",
+          "total_cost": 52.0,
+          "path_length": 12,
+          "nodes_expanded": 384,
+          "nodes_generated": 688,
+          "execution_time_ms": 34.674,
+          "steps": [
+            {
+              "step": 0,
+              "action_type": "INITIAL",
+              "description": "Initial puzzle configuration",
+              "cost": 0.0,
+              "cum_cost": 0.0,
+              "target": null,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 1,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 5.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 10.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 15.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 4,
+              "action_type": "SIDE_GATE",
+              "description": "SideGate(r=2)",
+              "cost": 1.0,
+              "cum_cost": 16.0,
+              "target": {
+                "row": 2,
+                "col": null
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 5,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=0)",
+              "cost": 3.0,
+              "cum_cost": 19.0,
+              "target": {
+                "row": 3,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 6,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=0)",
+              "cost": 5.0,
+              "cum_cost": 24.0,
+              "target": {
+                "row": 2,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 7,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 29.0,
+              "target": {
+                "row": 1,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 8,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 34.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 9,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=1)",
+              "cost": 3.0,
+              "cum_cost": 37.0,
+              "target": {
+                "row": 3,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 10,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=1)",
+              "cost": 5.0,
+              "cum_cost": 42.0,
+              "target": {
+                "row": 2,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 11,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 47.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 12,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 52.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            }
+          ]
+        },
+        "rbfs": {
+          "algorithm": "RBFS",
+          "total_cost": 52.0,
+          "path_length": 12,
+          "nodes_expanded": 42606,
+          "nodes_generated": 117612,
+          "execution_time_ms": 3131.778,
+          "steps": [
+            {
+              "step": 0,
+              "action_type": "INITIAL",
+              "description": "Initial puzzle configuration",
+              "cost": 0.0,
+              "cum_cost": 0.0,
+              "target": null,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 1,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 5.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 2,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 10.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 3,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 15.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 4,
+              "action_type": "SIDE_GATE",
+              "description": "SideGate(r=2)",
+              "cost": 1.0,
+              "cum_cost": 16.0,
+              "target": {
+                "row": 2,
+                "col": null
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.5,
+                  0.5
+                ],
+                [
+                  0.5,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 5,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=0)",
+              "cost": 3.0,
+              "cum_cost": 19.0,
+              "target": {
+                "row": 3,
+                "col": 0
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 6,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=0)",
+              "cost": 5.0,
+              "cum_cost": 24.0,
+              "target": {
+                "row": 2,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 7,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 29.0,
+              "target": {
+                "row": 1,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 8,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=0)",
+              "cost": 5.0,
+              "cum_cost": 34.0,
+              "target": {
+                "row": 0,
+                "col": 0
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.5
+                ],
+                [
+                  0.0,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "step": 9,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=3->2, c=1)",
+              "cost": 3.0,
+              "cum_cost": 37.0,
+              "target": {
+                "row": 3,
+                "col": 1
+              },
+              "delta_s": 0.5,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 10,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=2->1, c=1)",
+              "cost": 5.0,
+              "cum_cost": 42.0,
+              "target": {
+                "row": 2,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 11,
+              "action_type": "TOP_DOWN",
+              "description": "Drop(r=1->0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 47.0,
+              "target": {
+                "row": 1,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            },
+            {
+              "step": 12,
+              "action_type": "COLLECTOR_FLUSH",
+              "description": "Flush(r=0, c=1)",
+              "cost": 5.0,
+              "cum_cost": 52.0,
+              "target": {
+                "row": 0,
+                "col": 1
+              },
+              "delta_s": 1.0,
+              "state": [
                 [
                   0.0,
                   0.0

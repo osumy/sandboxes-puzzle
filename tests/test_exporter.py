@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 from sandboxes_puzzle.exporter import (
     generate_professor_benchmark_presets,
+    generate_side_gate_trap_presets,
     format_trace,
 )
 from sandboxes_puzzle.environment.state import PuzzleState
@@ -35,6 +36,17 @@ class TestExporter:
 
         assert "optimal_ucs_50" in traces
         assert traces["optimal_ucs_50"]["total_cost"] == 50.0
+
+    def test_side_gate_trap_presets(self):
+        presets = generate_side_gate_trap_presets()
+        traces = presets["traces"]
+        # UCS and A* find optimal cost 52.0
+        assert traces["ucs"]["total_cost"] == 52.0
+        assert traces["astar"]["total_cost"] == 52.0
+        # Greedy gets trapped at 54.0
+        assert traces["greedy"]["total_cost"] == 54.0
+        # A* expands significantly fewer nodes than UCS
+        assert traces["astar"]["nodes_expanded"] < traces["ucs"]["nodes_expanded"]
 
     def test_format_trace_structure(self):
         st = PuzzleState([(1.0, 0.0), (0.0, 0.5)])

@@ -212,6 +212,41 @@ def generate_professor_benchmark_presets() -> Dict[str, Any]:
     }
 
 
+def generate_side_gate_trap_presets() -> Dict[str, Any]:
+    """
+    Generates verified traces for the Side-Gate Optimization & Greedy Trap showcase (4-row):
+    Row 3: [0.5, 0.5]
+    Row 2: [1.0, 0.0]
+    Row 1: [0.0, 1.0]
+    Row 0: [1.0, 0.0]
+    Features:
+      - A* and UCS find optimal cost 52.0 by strategically opening SideGate(r=2) to merge halves.
+      - Greedy Best-First gets trapped into cost 54.0 by skipping SideGate and dropping vertically.
+      - DFS drifts into a wild detour with cost 87.0 (23 steps).
+      - BFS and IDS also find cost 52.0.
+      - RBFS reaches the optimal cost 52.0 in linear space.
+    """
+    st = PuzzleState([(1.0, 0.0), (0.0, 1.0), (1.0, 0.0), (0.5, 0.5)])
+    heur = CombinedHeuristic()
+    algos = [
+        BreadthFirstSearch(),
+        DepthFirstSearch(max_depth=25),
+        UniformCostSearch(),
+        IterativeDeepeningSearch(max_limit=15),
+        GreedyBestFirstSearch(heur),
+        AStarSearch(heur),
+        RecursiveBestFirstSearch(heur, max_expansions=50000),
+    ]
+    traces: Dict[str, Any] = {}
+    for algo in algos:
+        res = algo.solve(st)
+        traces[algo.name.lower().replace("*", "star")] = format_trace(st, res)
+    return {
+        "initial_state": st.to_list(top_to_bottom=False),
+        "traces": traces,
+    }
+
+
 def generate_and_export_all_data(output_path: Path) -> Dict[str, Any]:
     """
     Run full state space evaluations, comparative benchmarks, and write data.js.
@@ -228,6 +263,9 @@ def generate_and_export_all_data(output_path: Path) -> Dict[str, Any]:
 
     print("Generating professor benchmark traces...")
     prof_data = generate_professor_benchmark_presets()
+
+    print("Generating side-gate trap & optimization showcase traces...")
+    side_gate_trap_data = generate_side_gate_trap_presets()
 
     # Generate sample 5-row puzzle traces for all 7 algorithms
     print("Generating 5-row sample traces for all 7 algorithms...")
@@ -271,6 +309,7 @@ def generate_and_export_all_data(output_path: Path) -> Dict[str, Any]:
                 "initial_state": sample_state.to_list(top_to_bottom=False),
                 "traces": sample_traces,
             },
+            "side_gate_trap": side_gate_trap_data,
         },
     }
 

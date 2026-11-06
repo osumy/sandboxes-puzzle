@@ -122,6 +122,23 @@ document.addEventListener("DOMContentLoaded", () => {
         algoSelect.appendChild(opt);
       });
       currentAlgorithmKey = "astar";
+    } else if (currentPresetKey === "side_gate_trap") {
+      const options = [
+        { key: "astar", label: "A* Search (Optimal: Cost 52.0, Uses Side-Gate)" },
+        { key: "ucs", label: "Uniform Cost Search (UCS: Cost 52.0, 1742 Nodes)" },
+        { key: "greedy", label: "Greedy Best-First (Trap: Cost 54.0, Misses Side-Gate)" },
+        { key: "bfs", label: "Breadth-First Search (BFS: Cost 52.0)" },
+        { key: "dfs", label: "Depth-First Search (DFS: Wild Detour, Cost 87.0)" },
+        { key: "ids", label: "Iterative Deepening Search (IDS: Cost 52.0)" },
+        { key: "rbfs", label: "Recursive Best-First Search (RBFS: Cost 52.0)" },
+      ];
+      options.forEach(o => {
+        const opt = document.createElement("option");
+        opt.value = o.key;
+        opt.textContent = o.label;
+        algoSelect.appendChild(opt);
+      });
+      currentAlgorithmKey = "astar";
     }
   }
 
@@ -145,7 +162,13 @@ document.addEventListener("DOMContentLoaded", () => {
       player.loadTrace(trace);
       populateActionLog(trace.steps);
       if (optCostDisplay) {
-        optCostDisplay.textContent = currentPresetKey === "professor_case" ? "45.0" : trace.total_cost.toFixed(1);
+        if (currentPresetKey === "professor_case") {
+          optCostDisplay.textContent = "50.0";
+        } else if (currentPresetKey === "side_gate_trap") {
+          optCostDisplay.textContent = "52.0";
+        } else {
+          optCostDisplay.textContent = trace.total_cost.toFixed(1);
+        }
       }
     }
   }
