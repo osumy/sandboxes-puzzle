@@ -1,0 +1,108 @@
+{
+  "num_rows": 4,
+  "total_states": 6561,
+  "evaluated_states": 6560,
+  "elapsed_seconds": 0.304,
+  "mean_ratio": 1.0316,
+  "median_ratio": 1.0233,
+  "min_ratio": 1.0,
+  "max_ratio": 1.1667,
+  "std_ratio": 0.0341,
+  "histogram_bins": [
+    {
+      "bin_start": 1.0,
+      "bin_end": 1.011,
+      "frequency": 2331,
+      "percentage": 35.53
+    },
+    {
+      "bin_start": 1.011,
+      "bin_end": 1.022,
+      "frequency": 890,
+      "percentage": 13.57
+    },
+    {
+      "bin_start": 1.022,
+      "bin_end": 1.033,
+      "frequency": 699,
+      "percentage": 10.66
+    },
+    {
+      "bin_start": 1.033,
+      "bin_end": 1.044,
+      "frequency": 656,
+      "percentage": 10.0
+    },
+    {
+      "bin_start": 1.044,
+      "bin_end": 1.056,
+      "frequency": 561,
+      "percentage": 8.55
+    },
+    {
+      "bin_start": 1.056,
+      "bin_end": 1.067,
+      "frequency": 423,
+      "percentage": 6.45
+    },
+    {
+      "bin_start": 1.067,
+      "bin_end": 1.078,
+      "frequency": 327,
+      "percentage": 4.98
+    },
+    {
+      "bin_start": 1.078,
+      "bin_end": 1.089,
+      "frequency": 182,
+      "percentage": 2.77
+    },
+    {
+      "bin_start": 1.089,
+      "bin_end": 1.1,
+      "frequency": 114,
+      "percentage": 1.74
+    },
+    {
+      "bin_start": 1.1,
+      "bin_end": 1.111,
+      "frequency": 119,
+      "percentage": 1.81
+    },
+    {
+      "bin_start": 1.111,
+      "bin_end": 1.122,
+      "frequency": 97,
+      "percentage": 1.48
+    },
+    {
+      "bin_start": 1.122,
+      "bin_end": 1.133,
+      "frequency": 81,
+      "percentage": 1.23
+    },
+    {
+      "bin_start": 1.133,
+      "bin_end": 1.144,
+      "frequency": 49,
+      "percentage": 0.75
+    },
+    {
+      "bin_start": 1.144,
+      "bin_end": 1.156,
+      "frequency": 24,
+      "percentage": 0.37
+    },
+    {
+      "bin_start": 1.156,
+      "bin_end": 1.167,
+      "frequency": 7,
+      "percentage": 0.11
+    }
+  ],
+  "figures": {
+    "histogram": "C:\\Users\\amira\\Desktop\\ai\\vibe code\\1\\sandboxes-puzzle\\reports\\figures\\histogram_greedy_opt_ratio.png",
+    "scatter_greedy_opt": "C:\\Users\\amira\\Desktop\\ai\\vibe code\\1\\sandboxes-puzzle\\reports\\figures\\scatter_greedy_vs_opt.png",
+    "scatter_actions_b": "C:\\Users\\amira\\Desktop\\ai\\vibe code\\1\\sandboxes-puzzle\\reports\\figures\\scatter_actions_vs_type_b.png"
+  }
+}

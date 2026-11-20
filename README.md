@@ -1,11 +1,31 @@
 # Sandboxes Puzzle (معمای جعبه‌های شن)
 
-[![CI - Test Suite](https://img.shields.io/badge/pytest-41%20passed-brightgreen.svg)](tests/)
+[![CI - Test Suite](https://img.shields.io/badge/pytest-50%20passed-brightgreen.svg)](tests/)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](pyproject.toml)
-[![Documentation](https://img.shields.io/badge/docs-Persian%20%26%20English-blueviolet.svg)](PROBLEM_SPEC_FA.md)
+[![Documentation](https://img.shields.io/badge/docs-Persian%20%26%20English-blueviolet.svg)](REPORT_PROJECT2.md)
 [![Zero Dependency Visualizer](https://img.shields.io/badge/visualizer-vanilla%20HTML5%2FCSS%2FJS-orange.svg)](visualizer/)
 
-An advanced Artificial Intelligence search and optimization system for the **Sandboxes Puzzle (معمای جعبه‌های شن)**, implementing both uninformed and informed search algorithms following Russell & Norvig's *Artificial Intelligence: A Modern Approach (AIMA)* standard. Includes full state space analysis ($3^{10} = 59,049$ states), proofs of admissibility and consistency, and an interactive, zero-dependency modern HTML5 Canvas web visualizer.
+An advanced Artificial Intelligence search and optimization system for the **Sandboxes Puzzle (معمای جعبه‌های شن)**, implementing uninformed and informed search algorithms following Russell & Norvig's *Artificial Intelligence: A Modern Approach (AIMA)* standard. Features problem relaxation proofs, machine learning heuristic discovery via Linear Regression, Effective Branching Factor ($b^*$) estimation, and full state space evaluation ($3^{10} = 59,049$ states).
+
+---
+
+## 🌟 Project 2 Highlights (تکلیف ۲: جستجوی آگاهانه و یادگیری آروینی)
+
+- **Machine Learning Heuristic via Linear Regression**:
+  - $12 + 2n$ domain-grounded physical features (mass, row-weighted distance, column asymmetry, obstruction index).
+  - Ground-truth dataset $(X, y)$ generated instantaneously via Backward Dijkstra.
+  - OLS, Ridge, and NNLS models achieving **$R^2 = 0.9975$** and **$\text{MAE} = 0.66$**.
+  - Prunes A* search on the professor's benchmark state from 2068 nodes (UCS) and 55 nodes ($h_3$) to **just 11 nodes**!
+- **Effective Branching Factor ($b^*$) Estimation**:
+  - Slide 41 formula: $b^* = \sqrt[d]{N} = N^{1/d}$
+  - Russell & Norvig AIMA standard formula: $N + 1 = \sum_{i=0}^d (b^*)^i$ solved via Brent's method.
+  - Stratified benchmark across depths $d \in \{2, 4, 6, 8, 10\}$.
+- **Comprehensive Visualizations & Figures**:
+  - Histogram of Greedy Suboptimality Ratio ($\text{Greedy\_opt\_ratio} = C_{\text{greedy}} / C_{\text{opt}}$).
+  - Scatter Plot 1: $x = \text{Cost by Greedy Solution}$, $y = \text{Optimum Cost}$ (with $y=x$ reference line).
+  - Scatter Plot 2: $x = \text{Total Actions to Goal}$, $y = \text{Type } b \text{ Actions}$.
+- **One-Command Master Runner**:
+  - Run `python run_project2.py` to execute tests, train ML models, benchmark $b^*$, and generate all figures in seconds.
 
 ---
 
