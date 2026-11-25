@@ -145,8 +145,11 @@ document.addEventListener("DOMContentLoaded", () => {
         { key: "side_gate_45", label: "Side Gates Approach (Optimum - Cost 45)" },
         { key: "alternative_46", label: "Other Alternative (Cost 46)" },
         { key: "greedy_47", label: "GreedyStar (Cost 47)" },
-        { key: "optimal_ucs_50", label: "UCS Baseline (Cost 50)" },
-        { key: "astar_50", label: "A* Optimal (Cost 50)" },
+        { key: "astar_learned", label: "A* Learned Regression h_reg (11 Nodes! b*=1.017)" },
+        { key: "astar_admissible", label: "A* Admissible Scaled h_adm (Cost 50)" },
+        { key: "astar_50", label: "A* Relaxed h3 (55 Nodes, Cost 50)" },
+        { key: "rbfs_learned", label: "RBFS Learned Regression h_reg (10 Nodes)" },
+        { key: "optimal_ucs_50", label: "UCS Baseline (2,068 Nodes, Cost 50)" },
       ];
       options.forEach(o => {
         const opt = document.createElement("option");
@@ -157,13 +160,16 @@ document.addEventListener("DOMContentLoaded", () => {
       currentAlgorithmKey = "side_gate_45";
     } else if (currentPresetKey === "sample_5row") {
       const options = [
-        { key: "astar", label: "A* Search (Optimal)" },
+        { key: "astar", label: "A* Search (h3 Relaxed, Optimal)" },
+        { key: "astar_learned", label: "A* (Learned Regression h_reg)" },
+        { key: "astar_admissible", label: "A* (Admissible h_adm)" },
         { key: "ucs", label: "Uniform Cost Search (UCS)" },
         { key: "greedystar", label: "GreedyStar" },
         { key: "bfs", label: "Breadth-First Search (BFS)" },
         { key: "dfs", label: "Depth-First Search (DFS)" },
         { key: "ids", label: "Iterative Deepening Search (IDS)" },
         { key: "rbfs", label: "Recursive Best-First Search (RBFS)" },
+        { key: "rbfs_learned", label: "RBFS (Learned Regression h_reg)" },
       ];
       options.forEach(o => {
         const opt = document.createElement("option");
@@ -174,13 +180,16 @@ document.addEventListener("DOMContentLoaded", () => {
       currentAlgorithmKey = "astar";
     } else if (currentPresetKey === "side_gate_trap") {
       const options = [
-        { key: "astar", label: "A* Search (Optimal: Cost 52.0, Uses Side-Gate)" },
+        { key: "astar", label: "A* Search (h3 Relaxed, Cost 52.0)" },
+        { key: "astar_learned", label: "A* (Learned Regression h_reg)" },
+        { key: "astar_admissible", label: "A* (Admissible h_adm)" },
         { key: "ucs", label: "Uniform Cost Search (UCS: Cost 52.0, 1742 Nodes)" },
         { key: "greedystar", label: "GreedyStar" },
         { key: "bfs", label: "Breadth-First Search (BFS: Cost 52.0)" },
         { key: "dfs", label: "Depth-First Search (DFS: Wild Detour, Cost 87.0)" },
         { key: "ids", label: "Iterative Deepening Search (IDS: Cost 52.0)" },
         { key: "rbfs", label: "Recursive Best-First Search (RBFS: Cost 52.0)" },
+        { key: "rbfs_learned", label: "RBFS (Learned Regression h_reg)" },
       ];
       options.forEach(o => {
         const opt = document.createElement("option");
@@ -192,16 +201,19 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (currentPresetKey === "custom_generated") {
       const preset = window.SANDBOX_DATA.presets["custom_generated"];
       if (preset && preset.traces) {
-        const order = ["astar", "ucs", "greedystar", "bfs", "dfs", "ids", "rbfs"];
+        const order = ["astar", "astar_learned", "astar_admissible", "ucs", "greedystar", "bfs", "dfs", "ids", "rbfs", "rbfs_learned"];
         const titles = {
-          astar: "A* Search (Optimal)",
+          astar: "A* Search (h3 Relaxed)",
+          astar_learned: "A* (Learned Regression h_reg)",
+          astar_admissible: "A* (Admissible h_adm)",
           ucs: "Uniform Cost Search (UCS)",
           greedystar: "GreedyStar",
           greedy: "GreedyStar",
           bfs: "Breadth-First Search (BFS)",
           dfs: "Depth-First Search (DFS)",
           ids: "Iterative Deepening Search (IDS)",
-          rbfs: "Recursive Best-First Search (RBFS)"
+          rbfs: "Recursive Best-First Search (RBFS)",
+          rbfs_learned: "RBFS (Learned Regression h_reg)"
         };
         order.forEach(key => {
           const tr = preset.traces[key] || (key === "greedystar" ? preset.traces["greedy"] : null);
@@ -254,6 +266,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (trace) {
       player.loadTrace(trace);
       populateActionLog(trace.steps);
+      const traceNodesEl = document.getElementById("traceNodesDisplay");
+      const traceBStarEl = document.getElementById("traceBStarDisplay");
+      if (traceNodesEl) {
+        traceNodesEl.textContent = trace.nodes_expanded !== undefined ? trace.nodes_expanded.toLocaleString() : "--";
+      }
+      if (traceBStarEl) {
+        if (trace.b_star_slide && trace.b_star_aima) {
+          traceBStarEl.textContent = `${Number(trace.b_star_slide).toFixed(3)} / ${Number(trace.b_star_aima).toFixed(3)}`;
+        } else {
+          traceBStarEl.textContent = "--";
+        }
+      }
       if (optCostDisplay) {
         if (currentPresetKey === "professor_case") {
           optCostDisplay.textContent = "45.0";

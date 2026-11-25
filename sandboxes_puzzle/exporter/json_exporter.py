@@ -23,9 +23,18 @@ from sandboxes_puzzle.algorithms.informed import (
     AStarSearch,
     RecursiveBestFirstSearch,
 )
-from sandboxes_puzzle.heuristics import CombinedHeuristic
+from sandboxes_puzzle.heuristics import (
+    CombinedHeuristic,
+    LearnedRegressionHeuristic,
+    AdmissibleLearnedHeuristic,
+)
 from sandboxes_puzzle.benchmarks.evaluator import StateSpaceEvaluator
 from sandboxes_puzzle.benchmarks.comparative import ComparativeBenchmark
+from sandboxes_puzzle.benchmarks.effective_branching import (
+    EffectiveBranchingBenchmark,
+    compute_b_star_slide,
+    compute_b_star_aima,
+)
 
 
 def format_trace(initial_state: PuzzleState, result: SearchResult) -> Dict[str, Any]:
@@ -74,8 +83,24 @@ def format_trace(initial_state: PuzzleState, result: SearchResult) -> Dict[str, 
         "nodes_expanded": result.nodes_expanded,
         "nodes_generated": result.nodes_generated,
         "execution_time_ms": result.execution_time_ms,
+        "b_star_slide": compute_b_star_slide(result.nodes_expanded, result.path_length) if result.is_goal_found else None,
+        "b_star_aima": compute_b_star_aima(result.nodes_expanded, result.path_length) if result.is_goal_found else None,
         "steps": steps,
     }
+
+
+def _load_learned_heuristics(num_rows: int):
+    weights_path = Path(__file__).resolve().parent.parent / "heuristics" / "data" / f"learned_weights_n{num_rows}.json"
+    if weights_path.exists():
+        h_reg = LearnedRegressionHeuristic(weights_path=str(weights_path), num_rows=num_rows)
+        raw = json.loads(weights_path.read_text(encoding="utf-8"))
+        alpha = float(raw.get("strict_alpha", 0.94))
+    else:
+        h_reg = LearnedRegressionHeuristic(num_rows=num_rows)
+        alpha = 0.94
+        raw = {}
+    h_adm = AdmissibleLearnedHeuristic(h_reg, safety_scale=alpha, enforce_h3_upper_bound=True)
+    return h_reg, h_adm, raw
 
 
 def generate_professor_benchmark_presets() -> Dict[str, Any]:
@@ -99,6 +124,14 @@ def generate_professor_benchmark_presets() -> Dict[str, Any]:
     astar = AStarSearch(heur)
     res_astar = astar.solve(bench)
     astar_trace = format_trace(bench, res_astar)
+
+    h_reg4, h_adm4, _ = _load_learned_heuristics(4)
+    astar_reg_trace = format_trace(bench, AStarSearch(h_reg4).solve(bench))
+    astar_reg_trace["algorithm"] = "A* (Learned Regression h_reg)"
+    astar_adm_trace = format_trace(bench, AStarSearch(h_adm4).solve(bench))
+    astar_adm_trace["algorithm"] = "A* (Admissible h_adm)"
+    rbfs_reg_trace = format_trace(bench, RecursiveBestFirstSearch(h_reg4, max_expansions=50000).solve(bench))
+    rbfs_reg_trace["algorithm"] = "RBFS (Learned Regression h_reg)"
 
     # GreedyStar trace (cost 47.0):
     # Column 0: 5 + 5 + 9 + 5 = 24.0 | Column 1: 9 + 9 + 5 = 23.0 ==> Total 47.0 (7 actions)
@@ -202,6 +235,9 @@ def generate_professor_benchmark_presets() -> Dict[str, Any]:
             "greedy_47": build_custom_trace("GreedyStar (Cost 47)", 47.0, greedy_steps_def),
             "optimal_ucs_50": ucs_trace,
             "astar_50": astar_trace,
+            "astar_learned": astar_reg_trace,
+            "astar_admissible": astar_adm_trace,
+            "rbfs_learned": rbfs_reg_trace,
         }
     }
 
@@ -222,6 +258,7 @@ def generate_side_gate_trap_presets() -> Dict[str, Any]:
     """
     st = PuzzleState([(1.0, 0.0), (0.0, 1.0), (1.0, 0.0), (0.5, 0.5)])
     heur = CombinedHeuristic()
+    h_reg4, h_adm4, _ = _load_learned_heuristics(4)
     algos = [
         BreadthFirstSearch(),
         DepthFirstSearch(max_depth=25),
@@ -236,6 +273,12 @@ def generate_side_gate_trap_presets() -> Dict[str, Any]:
         res = algo.solve(st)
         key = algo.name.lower().replace("*", "star")
         traces[key] = format_trace(st, res)
+    traces["astar_learned"] = format_trace(st, AStarSearch(h_reg4).solve(st))
+    traces["astar_learned"]["algorithm"] = "A* (Learned Regression h_reg)"
+    traces["astar_admissible"] = format_trace(st, AStarSearch(h_adm4).solve(st))
+    traces["astar_admissible"]["algorithm"] = "A* (Admissible h_adm)"
+    traces["rbfs_learned"] = format_trace(st, RecursiveBestFirstSearch(h_reg4, max_expansions=50000).solve(st))
+    traces["rbfs_learned"]["algorithm"] = "RBFS (Learned Regression h_reg)"
     if "greedystar" in traces and "greedy" not in traces:
         traces["greedy"] = traces["greedystar"]
     return {
@@ -269,6 +312,8 @@ def generate_and_export_all_data(output_path: Path) -> Dict[str, Any]:
     sample_state = SandboxesEnv.generate_random_state(num_rows=5, seed=7)
     sample_traces: Dict[str, Any] = {}
     heur = CombinedHeuristic()
+    h_reg5, h_adm5, raw_n5 = _load_learned_heuristics(5)
+    _, _, raw_n4 = _load_learned_heuristics(4)
     sample_algos = [
         BreadthFirstSearch(),
         DepthFirstSearch(max_depth=30),
@@ -282,12 +327,22 @@ def generate_and_export_all_data(output_path: Path) -> Dict[str, Any]:
         res = algo.solve(sample_state)
         key = algo.name.lower().replace("*", "star")
         sample_traces[key] = format_trace(sample_state, res)
+    sample_traces["astar_learned"] = format_trace(sample_state, AStarSearch(h_reg5).solve(sample_state))
+    sample_traces["astar_learned"]["algorithm"] = "A* (Learned Regression h_reg)"
+    sample_traces["astar_admissible"] = format_trace(sample_state, AStarSearch(h_adm5).solve(sample_state))
+    sample_traces["astar_admissible"]["algorithm"] = "A* (Admissible h_adm)"
+    sample_traces["rbfs_learned"] = format_trace(sample_state, RecursiveBestFirstSearch(h_reg5, max_expansions=10000).solve(sample_state))
+    sample_traces["rbfs_learned"]["algorithm"] = "RBFS (Learned Regression h_reg)"
     if "greedystar" in sample_traces and "greedy" not in sample_traces:
         sample_traces["greedy"] = sample_traces["greedystar"]
 
+    print("Running Project 2 Effective Branching Factor (b*) stratified benchmark...")
+    bstar_bench = EffectiveBranchingBenchmark(num_rows=4)
+    bstar_results = bstar_bench.run_depth_stratified_benchmark()
+
     payload = {
         "meta": {
-            "version": "1.0.0",
+            "version": "2.0.0",
             "title": "Sandboxes Puzzle (معمای جعبه‌های شن)",
             "total_state_space_cardinality": 59049,
             "rows": 5,
@@ -302,6 +357,13 @@ def generate_and_export_all_data(output_path: Path) -> Dict[str, Any]:
             "histogram": space_results["histogram"],
             "plot1_greedy_vs_opt": space_results["plot1_greedy_vs_opt"],
             "plot2_actions_vs_type_b": space_results["plot2_actions_vs_type_b"],
+        },
+        "project2_analysis": {
+            "learned_models": {
+                "4": raw_n4,
+                "5": raw_n5,
+            },
+            "effective_branching": bstar_results,
         },
         "presets": {
             "professor_case": prof_data,

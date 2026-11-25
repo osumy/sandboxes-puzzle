@@ -22,7 +22,11 @@ if str(PROJECT_DIR) not in sys.path:
 from sandboxes_puzzle.environment.state import PuzzleState
 from sandboxes_puzzle.environment.environment import SandboxesEnv
 from sandboxes_puzzle.exporter.json_exporter import format_trace
-from sandboxes_puzzle.heuristics import CombinedHeuristic
+from sandboxes_puzzle.heuristics import (
+    CombinedHeuristic,
+    LearnedRegressionHeuristic,
+    AdmissibleLearnedHeuristic,
+)
 from sandboxes_puzzle.algorithms.uninformed import (
     BreadthFirstSearch,
     DepthFirstSearch,
@@ -98,20 +102,36 @@ class SandboxesAPIHandler(SimpleHTTPRequestHandler):
 
     def _solve_all(self, state: PuzzleState):
         heur = CombinedHeuristic()
+        n = state.num_rows
+        weights_file = PROJECT_DIR / "sandboxes_puzzle" / "heuristics" / "data" / f"learned_weights_n{n}.json"
+        if weights_file.exists():
+            h_reg = LearnedRegressionHeuristic(weights_path=str(weights_file), num_rows=n)
+            alpha = float(json.loads(weights_file.read_text(encoding="utf-8")).get("strict_alpha", 0.94))
+        else:
+            h_reg = LearnedRegressionHeuristic(num_rows=n)
+            alpha = 0.94
+        h_adm = AdmissibleLearnedHeuristic(h_reg, safety_scale=alpha, enforce_h3_upper_bound=True)
+
         algos = [
-            ("astar", AStarSearch(heur)),
-            ("ucs", UniformCostSearch()),
-            ("greedystar", GreedyStarSearch()),
-            ("greedy", GreedyStarSearch()),
-            ("bfs", BreadthFirstSearch()),
-            ("dfs", DepthFirstSearch(max_depth=35)),
-            ("ids", IterativeDeepeningSearch(max_limit=20)),
-            ("rbfs", RecursiveBestFirstSearch(heur, max_expansions=25000)),
+            ("astar", AStarSearch(heur), None),
+            ("astar_learned", AStarSearch(h_reg), "A* (Learned Regression h_reg)"),
+            ("astar_admissible", AStarSearch(h_adm), "A* (Admissible h_adm)"),
+            ("ucs", UniformCostSearch(), None),
+            ("greedystar", GreedyStarSearch(), None),
+            ("greedy", GreedyStarSearch(), None),
+            ("bfs", BreadthFirstSearch(), None),
+            ("dfs", DepthFirstSearch(max_depth=35), None),
+            ("ids", IterativeDeepeningSearch(max_limit=20), None),
+            ("rbfs", RecursiveBestFirstSearch(heur, max_expansions=25000), None),
+            ("rbfs_learned", RecursiveBestFirstSearch(h_reg, max_expansions=10000), "RBFS (Learned Regression h_reg)"),
         ]
         traces = {}
-        for key, algo in algos:
+        for key, algo, custom_label in algos:
             res = algo.solve(state)
-            traces[key] = format_trace(state, res)
+            tr = format_trace(state, res)
+            if custom_label:
+                tr["algorithm"] = custom_label
+            traces[key] = tr
         return traces
 
     def _send_json(self, data, status=200):

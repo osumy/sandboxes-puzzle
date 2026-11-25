@@ -77,6 +77,11 @@ class TestExporter:
 
         assert data["meta"]["total_state_space_cardinality"] == 59049
         assert len(data["benchmark_summary"]) == 7
+        assert "astar_learned" in data["presets"]["professor_case"]["traces"]
+        assert "astar_admissible" in data["presets"]["professor_case"]["traces"]
+        assert "rbfs_learned" in data["presets"]["professor_case"]["traces"]
+        assert "project2_analysis" in data
+        assert len(data["project2_analysis"]["effective_branching"]) >= 1
         assert len(data["state_space_analysis"]["histogram"]["counts"]) == 10
         assert len(data["state_space_analysis"]["plot1_greedy_vs_opt"]) > 0
         assert len(data["state_space_analysis"]["plot2_actions_vs_type_b"]) > 0

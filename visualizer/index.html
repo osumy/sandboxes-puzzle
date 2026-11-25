@@ -112,6 +112,17 @@
             </div>
           </div>
 
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="metric-card" style="padding: 12px 14px;">
+              <h3>Nodes Expanded</h3>
+              <div class="metric-value" style="font-size: 1.25rem;" id="traceNodesDisplay">--</div>
+            </div>
+            <div class="metric-card" style="padding: 12px 14px;">
+              <h3>Branching b* (Slide / AIMA)</h3>
+              <div class="metric-value" style="font-size: 1.1rem;" id="traceBStarDisplay">--</div>
+            </div>
+          </div>
+
           <!-- Timeline Scrubber -->
           <div class="timeline-card">
             <div class="timeline-controls">
@@ -200,6 +211,65 @@
           </thead>
           <tbody id="benchmarkTableBody">
             <!-- Dynamically populated from data.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Project 2 Section: Learned Regression Heuristics & Effective Branching Factor (b*) -->
+      <div class="dashboard-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Project 2: Nodes Expanded on Professor's Benchmark</h3>
+            <span class="badge">2,068 &rarr; 55 &rarr; 11 Nodes</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">
+            Compares UCS ($h=0$), A* ($h_3$ relaxed), A* ($h_{\text{reg}}$ OLS regression), and A* ($h_{\text{adm}}$ safety-scaled).
+          </p>
+          <canvas id="bstarBarCanvas" class="chart-canvas"></canvas>
+        </div>
+
+        <div class="table-card">
+          <div class="chart-header" style="margin-bottom: 10px;">
+            <h3>Linear Regression Heuristic Models ($12 + 2n$ Features)</h3>
+            <span class="badge">Backward Dijkstra Ground Truth</span>
+          </div>
+          <table class="data-table" style="font-size: 0.8rem;">
+            <thead>
+              <tr>
+                <th>Model (4-Row)</th>
+                <th>R&sup2;</th>
+                <th>MAE</th>
+                <th>RMSE</th>
+                <th>Admissibility</th>
+              </tr>
+            </thead>
+            <tbody id="regressionModelsBody">
+              <!-- Populated from data.js -->
+            </tbody>
+          </table>
+          <p id="regressionAlphaNote" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 10px;"></p>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="chart-header" style="margin-bottom: 12px;">
+          <h3>Effective Branching Factor ($b^*$) — Slide 41 vs. AIMA Formula</h3>
+          <span class="badge">Professor Benchmark &amp; Stratified Depths</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Case / Depth</th>
+              <th>Algorithm &amp; Heuristic</th>
+              <th>Nodes Expanded ($N$)</th>
+              <th>Nodes Generated</th>
+              <th>Optimal Cost</th>
+              <th>$b^*$ (Slide 41: $N^{1/d}$)</th>
+              <th>$b^*$ (AIMA Brent)</th>
+            </tr>
+          </thead>
+          <tbody id="bstarTableBody">
+            <!-- Populated from data.js -->
           </tbody>
         </table>
       </div>
@@ -521,6 +591,23 @@
             <div class="formula-box cyan" style="font-size: 0.82rem; margin-top: 8px;">
               $$\text{GreedyStar Ratio} = \frac{\text{Cost}_{\text{GreedyStar}}}{\text{Cost}_{\text{Optimal}}} \quad (\text{Mean: } 0.814, \text{ Median: } 0.809)$$
             </div>
+          </div>
+
+          <!-- CARD 7: Project 2 Learned Regression Heuristics & Effective Branching Factor -->
+          <div class="theory-card" style="grid-column: 1 / -1;">
+            <div class="theory-card-header">
+              <h3><span>7. Project 2: Learned Regression Heuristics ($h_{\text{reg}}, h_{\text{adm}}$) &amp; Effective Branching Factor ($b^*$)</span></h3>
+              <span class="badge">AIMA ML Heuristics</span>
+            </div>
+            <p style="font-size: 0.84rem;">
+              Using exact ground-truth costs $h^*(s)$ computed across all $3^{2n}$ states via Backward Dijkstra, a $12 + 2n$ physical feature vector $x(s)$ (mass, row-weighted elevation, quadratic distance, column imbalance, side-gate opportunities, obstruction index, and raw cell fills) is fitted via OLS, Ridge, and NNLS ($R^2 = 0.9975$ for $n=4$, $R^2 = 0.9981$ for $n=5$):
+            </p>
+            <div class="formula-box cyan" style="font-size: 0.9rem;">
+              $$h_{\text{reg}}(s) = \max\bigl(0,\, w^\top x(s)\bigr), \qquad h_{\text{adm}}(s) = \min\bigl(\alpha \cdot h_{\text{reg}}(s),\, h_3(s)\bigr), \qquad b^*_{\text{slide}} = N^{1/d}, \qquad N + 1 = \sum_{i=0}^{d} (b^*_{\text{AIMA}})^i$$
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">
+              On the Professor's 4-row benchmark ($d=10$), replacing $h_3$ with $h_{\text{reg}}$ prunes A* node expansions from <strong>55</strong> (and UCS <strong>2,068</strong>) down to just <strong>11 nodes</strong> ($b^*_{\text{AIMA}} = 1.017$).
+            </p>
           </div>
 
         </div>

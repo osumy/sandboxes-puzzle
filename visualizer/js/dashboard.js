@@ -21,6 +21,7 @@ class BenchmarkDashboard {
     this.renderPlot2();
     this.renderHistogram();
     this.renderTable();
+    this.renderProject2Dashboard();
   }
 
   /**
@@ -318,6 +319,119 @@ class BenchmarkDashboard {
         <td>${optBadge}</td>
       `;
       tableBody.appendChild(tr);
+    }
+  }
+
+  /**
+   * Project 2: Render Learned Regression Model Metrics, b* Stratified Table & Node Bar Chart
+   */
+  renderProject2Dashboard() {
+    const p2 = this.data && this.data.project2_analysis;
+    if (!p2) return;
+
+    const regBody = document.getElementById("regressionModelsBody");
+    const alphaNote = document.getElementById("regressionAlphaNote");
+    const model4 = p2.learned_models && p2.learned_models["4"];
+    if (regBody && model4 && model4.all_models) {
+      regBody.innerHTML = "";
+      for (const [mName, mStats] of Object.entries(model4.all_models)) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${mName}</strong></td>
+          <td>${Number(mStats.r2_score).toFixed(4)}</td>
+          <td>${Number(mStats.mae).toFixed(3)}</td>
+          <td>${Number(mStats.rmse).toFixed(3)}</td>
+          <td>${(Number(mStats.admissibility_rate) * 100).toFixed(1)}%</td>
+        `;
+        regBody.appendChild(tr);
+      }
+      if (alphaNote) {
+        alphaNote.textContent = `Safety scaling alpha = ${model4.strict_alpha} ensures 100% admissibility for h_adm(s) = min(alpha * h_reg(s), h3(s)).`;
+      }
+    }
+
+    const bstarBody = document.getElementById("bstarTableBody");
+    const bstarList = p2.effective_branching || [];
+    if (bstarBody && bstarList.length > 0) {
+      bstarBody.innerHTML = "";
+      for (const caseEntry of bstarList) {
+        const algos = caseEntry.algorithms || {};
+        for (const [algoName, stats] of Object.entries(algos)) {
+          const tr = document.createElement("tr");
+          const isBest = algoName.includes("h_reg");
+          tr.innerHTML = `
+            <td>${caseEntry.label}</td>
+            <td><strong style="${isBest ? "color:var(--success)" : ""}">${algoName}</strong></td>
+            <td>${Number(stats.nodes_expanded).toLocaleString()}</td>
+            <td>${Number(stats.nodes_generated).toLocaleString()}</td>
+            <td>${Number(stats.cost).toFixed(1)}</td>
+            <td><code>${Number(stats.b_star_slide).toFixed(3)}</code></td>
+            <td><code>${Number(stats.b_star_aima).toFixed(3)}</code></td>
+          `;
+          bstarBody.appendChild(tr);
+        }
+      }
+    }
+
+    const canvas = document.getElementById("bstarBarCanvas");
+    if (canvas && bstarList.length > 0 && bstarList[0].algorithms) {
+      const algos = bstarList[0].algorithms;
+      const items = Object.entries(algos).map(([name, s]) => ({ name, val: s.nodes_expanded }));
+      const ctx = canvas.getContext("2d");
+      const dpr = Math.max(window.devicePixelRatio || 1, 2);
+      const w = canvas.clientWidth || 460;
+      const h = canvas.clientHeight || 280;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+
+      const padL = 52;
+      const padR = 16;
+      const padT = 26;
+      const padB = 56;
+      const plotW = w - padL - padR;
+      const plotH = h - padT - padB;
+      const maxVal = Math.max(...items.map(it => it.val), 10);
+      const barW = plotW / items.length;
+      const palette = ["#38bdf8", "#0284c7", "#10b981", "#34d399", "#8b5cf6", "#ec4899"];
+
+      ctx.strokeStyle = "#334155";
+      ctx.beginPath();
+      ctx.moveTo(padL, padT);
+      ctx.lineTo(padL, padT + plotH);
+      ctx.lineTo(padL + plotW, padT + plotH);
+      ctx.stroke();
+
+      items.forEach((it, idx) => {
+        const logNorm = Math.log10(Math.max(1, it.val)) / Math.log10(Math.max(10, maxVal));
+        const bh = Math.max(4, logNorm * plotH);
+        const bx = padL + idx * barW + 8;
+        const by = padT + plotH - bh;
+        ctx.fillStyle = palette[idx % palette.length];
+        ctx.fillRect(bx, by, Math.max(12, barW - 16), bh);
+
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "700 10px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(it.val.toLocaleString(), bx + Math.max(12, barW - 16) / 2, by - 5);
+
+        ctx.save();
+        ctx.translate(bx + Math.max(12, barW - 16) / 2, padT + plotH + 10);
+        ctx.rotate(-0.28);
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "600 9px monospace";
+        ctx.textAlign = "right";
+        ctx.fillText(it.name, 0, 0);
+        ctx.restore();
+      });
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "600 10px monospace";
+      ctx.textAlign = "left";
+      ctx.fillText("Log-scaled Nodes Expanded (Professor Benchmark)", padL, 14);
     }
   }
 }

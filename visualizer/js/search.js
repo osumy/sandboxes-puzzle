@@ -91,6 +91,154 @@ class SandboxesSolver {
   }
 
   /**
+   * Project 2: Extract 12 + 2n physical features matching PuzzleFeatureExtractor.
+   */
+  static extractFeatures(grid) {
+    const n = grid.length;
+    let totalSand = 0.0;
+    let rowWeighted = 0.0;
+    let rowSqWeighted = 0.0;
+    let col0Sand = 0.0;
+    let col1Sand = 0.0;
+    let sideGateOpps = 0.0;
+    let halfCount = 0.0;
+    let fullCount = 0.0;
+    let obstructionCount = 0.0;
+
+    for (let r = 0; r < n; r++) {
+      const s0 = grid[r][0];
+      const s1 = grid[r][1];
+      totalSand += s0 + s1;
+      col0Sand += s0;
+      col1Sand += s1;
+      const w = r + 1.0;
+      rowWeighted += w * (s0 + s1);
+      rowSqWeighted += w * w * (s0 + s1);
+      if ((s0 === 1.0 && s1 === 0.0) || (s0 === 0.0 && s1 === 1.0)) sideGateOpps += 1.0;
+      if (s0 === 0.5) halfCount += 1.0;
+      else if (s0 === 1.0) fullCount += 1.0;
+      if (s1 === 0.5) halfCount += 1.0;
+      else if (s1 === 1.0) fullCount += 1.0;
+      if (r > 0) {
+        if (s0 > 0.0 && grid[r - 1][0] === 1.0) obstructionCount += 1.0;
+        if (s1 > 0.0 && grid[r - 1][1] === 1.0) obstructionCount += 1.0;
+      }
+    }
+
+    const feats = [
+      totalSand,
+      rowWeighted,
+      rowSqWeighted,
+      col0Sand,
+      col1Sand,
+      Math.abs(col0Sand - col1Sand),
+      sideGateOpps,
+      halfCount,
+      fullCount,
+      grid[0][0] + grid[0][1],
+      grid[n - 1][0] + grid[n - 1][1],
+      obstructionCount
+    ];
+    for (let r = 0; r < n; r++) {
+      feats.push(grid[r][0], grid[r][1]);
+    }
+    return feats;
+  }
+
+  static _getLearnedModel(numRows) {
+    if (typeof window !== "undefined" && window.SANDBOX_DATA && window.SANDBOX_DATA.project2_analysis) {
+      const models = window.SANDBOX_DATA.project2_analysis.learned_models || {};
+      if (models[String(numRows)]) return models[String(numRows)];
+    }
+    if (numRows === 4) {
+      return {
+        intercept: 0.0,
+        strict_alpha: 0.9436,
+        weights: [
+          1.2422778350803585, 2.0170596874314066, 0.6562969055860788, 0.622059887033737,
+          0.6202179480466226, 0.027380144463050676, 0.10863144713381621, 0.8837454575170508,
+          0.8004051063218354, -0.21133795983363785, -0.7763293007107672, 0.1791552149914916,
+          -0.11137110876631974, -0.09996685106731759, 0.6806866184670034, 0.6754338182991706,
+          0.4433769092350739, 0.43044774962351545, -0.39063253190202124, -0.3856967688087459
+        ]
+      };
+    }
+    if (numRows === 5) {
+      return {
+        intercept: 0.0,
+        strict_alpha: 0.9419,
+        weights: [
+          1.2588229100636572, 2.6501013822730735, 0.4152478270589606, 0.6293499967271018,
+          0.6294729133365554, 0.021344851833705287, 0.1206288946394956, 0.8696707683595603,
+          0.8239875258838778, -0.49014401954278386, -0.8425755497349224, 0.12645330595370402,
+          -0.24480014355888527, -0.2453438759838979, 0.4001075974203137, 0.39810654689867647,
+          0.7097500770185449, 0.7068684012184684, 0.1873700719833176, 0.18933978480204372,
+          -0.42307760613618745, -0.41949794359873444
+        ]
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Project 2: Learned Linear Regression Heuristic h_reg(s) = max(0, w^T x(s)).
+   */
+  static heuristicLearned(grid) {
+    if (this.isGoal(grid)) return 0.0;
+    const model = this._getLearnedModel(grid.length);
+    if (!model || !model.weights) return this.heuristicH3(grid);
+    const feats = this.extractFeatures(grid);
+    let val = Number(model.intercept || 0.0);
+    const w = model.weights;
+    const len = Math.min(feats.length, w.length);
+    for (let i = 0; i < len; i++) {
+      val += w[i] * feats[i];
+    }
+    return Math.max(0.0, Math.round(val * 10000) / 10000);
+  }
+
+  /**
+   * Project 2: Admissible Calibrated Regression Heuristic h_adm(s) = min(alpha * h_reg(s), h3(s)).
+   */
+  static heuristicAdmissibleLearned(grid) {
+    if (this.isGoal(grid)) return 0.0;
+    const model = this._getLearnedModel(grid.length);
+    const alpha = model && model.strict_alpha ? Number(model.strict_alpha) : 0.94;
+    const hReg = alpha * this.heuristicLearned(grid);
+    const h3 = this.heuristicH3(grid);
+    return Math.min(hReg, h3);
+  }
+
+  /**
+   * Project 2: Effective Branching Factor b* (Slide 41 formula: N^(1/d)).
+   */
+  static computeBStarSlide(nodesExpanded, depth) {
+    if (depth <= 0 || nodesExpanded <= 0) return 1.0;
+    return Math.round(Math.pow(nodesExpanded, 1.0 / depth) * 10000) / 10000;
+  }
+
+  /**
+   * Project 2: Effective Branching Factor b* (AIMA formula: N + 1 = sum_{i=0}^d (b*)^i).
+   */
+  static computeBStarAIMA(nodesExpanded, depth) {
+    if (depth <= 0 || nodesExpanded <= depth) return 1.0;
+    const target = nodesExpanded + 1;
+    const evalPoly = (b) => {
+      if (Math.abs(b - 1.0) < 1e-9) return (depth + 1) - target;
+      return ((Math.pow(b, depth + 1) - 1.0) / (b - 1.0)) - target;
+    };
+    let lo = 1.0001;
+    let hi = 100.0;
+    if (evalPoly(lo) * evalPoly(hi) > 0) return this.computeBStarSlide(nodesExpanded, depth);
+    for (let iter = 0; iter < 60; iter++) {
+      const mid = 0.5 * (lo + hi);
+      if (evalPoly(mid) > 0) hi = mid;
+      else lo = mid;
+    }
+    return Math.round(0.5 * (lo + hi) * 10000) / 10000;
+  }
+
+  /**
    * Generates all valid successor transitions from a given grid.
    * Prunes non-operational (no-op) transitions where delta_s == 0.
    */
@@ -212,13 +360,17 @@ class SandboxesSolver {
       }
     }
 
+    const nodesExpanded = result ? result.nodesExpanded : 0;
+    const pathLen = result ? result.path.length : 0;
     return {
       algorithm: algoName,
       total_cost: result ? Math.round(result.totalCost * 10) / 10 : 0.0,
-      path_length: result ? result.path.length : 0,
-      nodes_expanded: result ? result.nodesExpanded : 0,
+      path_length: pathLen,
+      nodes_expanded: nodesExpanded,
       nodes_generated: result ? result.nodesGenerated : 1,
       execution_time_ms: result ? Math.round(result.timeMs * 10) / 10 : 0.0,
+      b_star_slide: pathLen > 0 ? this.computeBStarSlide(nodesExpanded, pathLen) : 1.0,
+      b_star_aima: pathLen > 0 ? this.computeBStarAIMA(nodesExpanded, pathLen) : 1.0,
       steps: steps
     };
   }
@@ -226,13 +378,14 @@ class SandboxesSolver {
   // ==========================================
   // ALGORITHM 1: A* SEARCH (Optimal & Monotone)
   // ==========================================
-  static astar(initialGrid) {
+  static astar(initialGrid, heuristicFn = null) {
+    const hFn = heuristicFn || ((g) => this.heuristicH3(g));
     const t0 = performance.now();
     if (this.isGoal(initialGrid)) {
       return { totalCost: 0.0, path: [], nodesExpanded: 0, nodesGenerated: 1, timeMs: 0.0 };
     }
 
-    const hRoot = this.heuristicH3(initialGrid);
+    const hRoot = hFn(initialGrid);
     const root = { state: initialGrid, parent: null, action: null, g: 0.0, depth: 0, f: hRoot };
     const frontier = new MinHeapPriorityQueue();
     let entryId = 0;
@@ -271,7 +424,7 @@ class SandboxesSolver {
 
         if (!bestG.has(sk) || newG < bestG.get(sk)) {
           bestG.set(sk, newG);
-          const hVal = this.heuristicH3(succ.state);
+          const hVal = hFn(succ.state);
           const newF = Math.round((newG + hVal) * 10000) / 10000;
           const child = {
             state: succ.state,
@@ -746,13 +899,14 @@ class SandboxesSolver {
   // ==========================================
   // ALGORITHM 7: RECURSIVE BEST-FIRST SEARCH (RBFS)
   // ==========================================
-  static rbfs(initialGrid, maxExpansions = 20000) {
+  static rbfs(initialGrid, maxExpansions = 20000, heuristicFn = null) {
+    const hFn = heuristicFn || ((g) => this.heuristicH3(g));
     const t0 = performance.now();
     if (this.isGoal(initialGrid)) {
       return { totalCost: 0.0, path: [], nodesExpanded: 0, nodesGenerated: 1, timeMs: 0.0 };
     }
 
-    const hRoot = this.heuristicH3(initialGrid);
+    const hRoot = hFn(initialGrid);
     const root = {
       state: initialGrid,
       parent: null,
@@ -799,7 +953,7 @@ class SandboxesSolver {
 
         if (!isCycle) {
           const newG = Math.round((node.g + succ.cost) * 10000) / 10000;
-          const hVal = this.heuristicH3(succ.state);
+          const hVal = hFn(succ.state);
           const staticF = Math.round((newG + hVal) * 10000) / 10000;
           const childF = Math.max(staticF, node.f);
 
@@ -859,9 +1013,17 @@ class SandboxesSolver {
   static solveAll(grid) {
     const traces = {};
 
-    console.log("[SandboxesSolver] Solving with A* Search...");
+    console.log("[SandboxesSolver] Solving with A* Search (h3)...");
     const resAStar = this.astar(grid);
-    traces["astar"] = this.formatTrace("A* Search (Optimal)", resAStar, grid);
+    traces["astar"] = this.formatTrace("A* Search (h3 Relaxed)", resAStar, grid);
+
+    console.log("[SandboxesSolver] Solving with A* (Learned Regression h_reg)...");
+    const resAStarReg = this.astar(grid, (g) => this.heuristicLearned(g));
+    traces["astar_learned"] = this.formatTrace("A* (Learned Regression h_reg)", resAStarReg, grid);
+
+    console.log("[SandboxesSolver] Solving with A* (Admissible h_adm)...");
+    const resAStarAdm = this.astar(grid, (g) => this.heuristicAdmissibleLearned(g));
+    traces["astar_admissible"] = this.formatTrace("A* (Admissible h_adm)", resAStarAdm, grid);
 
     console.log("[SandboxesSolver] Solving with Uniform Cost Search (UCS)...");
     const resUCS = this.ucs(grid);
@@ -887,6 +1049,10 @@ class SandboxesSolver {
     console.log("[SandboxesSolver] Solving with Recursive Best-First Search (RBFS)...");
     const resRBFS = this.rbfs(grid, 25000);
     traces["rbfs"] = this.formatTrace("Recursive Best-First Search (RBFS)", resRBFS, grid);
+
+    console.log("[SandboxesSolver] Solving with RBFS (Learned Regression h_reg)...");
+    const resRBFSReg = this.rbfs(grid, 10000, (g) => this.heuristicLearned(g));
+    traces["rbfs_learned"] = this.formatTrace("RBFS (Learned Regression h_reg)", resRBFSReg, grid);
 
     return {
       initial_state: grid.map(r => [r[0], r[1]]),
